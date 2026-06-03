@@ -1,6 +1,6 @@
 const express = require("express");
 const line = require("@line/bot-sdk");
-const { Translate } = require("@google-cloud/translate").v2;
+const OpenAI = require("openai");
 
 const app = express();
 
@@ -10,12 +10,15 @@ const config = {
 };
 
 const client = new line.Client(config);
-const translate = new Translate({ key: process.env.GOOGLE_API_KEY });
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 const userMode = {};
 
 function getUserKey(event) {
-  return event.source.groupId || event.source.roomId || event.source.userId;
+  return event.source.userId || event.source.groupId || event.source.roomId;
 }
 
 function menuFlex() {
@@ -29,46 +32,11 @@ function menuFlex() {
         layout: "vertical",
         spacing: "md",
         contents: [
-          {
-            type: "text",
-            text: "🌏 雙向翻譯",
-            weight: "bold",
-            size: "xl",
-            align: "center"
-          },
-          {
-            type: "button",
-            action: {
-              type: "message",
-              label: "🇹🇭 中泰雙向",
-              text: "設定 中泰"
-            }
-          },
-          {
-            type: "button",
-            action: {
-              type: "message",
-              label: "🇻🇳 中越雙向",
-              text: "設定 中越"
-            }
-          },
-          {
-            type: "button",
-            action: {
-              type: "message",
-              label: "🇺🇸 中英雙向",
-              text: "設定 中英"
-            }
-          },
-          {
-            type: "button",
-            style: "primary",
-            action: {
-              type: "message",
-              label: "🌍 多國翻譯",
-              text: "設定 多國"
-            }
-          }
+          { type: "text", text: "🌏 GPT 雙向翻譯", weight: "bold", size: "xl", align: "center" },
+          { type: "button", action: { type: "message", label: "🇹🇭 中泰雙向", text: "設定 中泰" } },
+          { type: "button", action: { type: "message", label: "🇻🇳 中越雙向", text: "設定 中越" } },
+          { type: "button", action: { type: "message", label: "🇺🇸 中英雙向", text: "設定 中英" } },
+          { type: "button", style: "primary", action: { type: "message", label: "🌍 多國翻譯", text: "設定 多國" } }
         ]
       }
     }
@@ -76,15 +44,31 @@ function menuFlex() {
 }
 
 async function replyText(event, text) {
-  return client.replyMessage(event.replyToken, {
-    type: "text",
-    text
-  });
+  return client.replyMessage(event.replyToken, { type: "text", text });
 }
 
-async function detectLanguage(text) {
-  const [detect] = await translate.detect(text);
-  return detect.language;
+async function gptTranslate(text, mode) {
+  let instruction = "";
+
+  if (mode === "zh-th") {
+    instruction = "你是專業中文泰文雙向翻譯。若輸入是中文，翻成自然泰文；若輸入是泰文，翻成自然繁體中文。只輸出翻譯結果。";
+  } else if (mode === "zh-vi") {
+    instruction = "你是專業中文越南文雙向翻譯。若輸入是中文，翻成自然越南文；若輸入是越南文，翻成自然繁體中文。只輸出翻譯結果。";
+  } else if (mode === "zh-en") {
+    instruction = "你是專業中文英文雙向翻譯。若輸入是中文，翻成自然英文；若輸入是英文，翻成自然繁體中文。只輸出翻譯結果。";
+  } else if (mode === "multi") {
+    instruction = "請把使用者文字翻譯成泰文、越南文、英文、繁體中文。格式：🇹🇭 泰文：...\n\n🇻🇳 越文：...\n\n🇺🇸 英文：...\n\n🇹🇼 中文：...。只輸出翻譯結果。";
+  }
+
+  const response = await openai.responses.create({
+    model: "gpt-4.1-mini",
+    input: [
+      { role: "system", content: instruction },
+      { role: "user", content: text }
+    ]
+  });
+
+  return response.output_text.trim();
 }
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
@@ -105,25 +89,25 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     if (text === "設定 中泰") {
       userMode[key] = "zh-th";
-      await replyText(event, "已切換：中泰雙向 🇹🇼↔️🇹🇭\n中文會翻泰文，泰文會翻中文");
+      await replyText(event, "已切換：GPT 中泰雙向 🇹🇼↔️🇹🇭");
       return res.status(200).end();
     }
 
     if (text === "設定 中越") {
       userMode[key] = "zh-vi";
-      await replyText(event, "已切換：中越雙向 🇹🇼↔️🇻🇳\n中文會翻越文，越文會翻中文");
+      await replyText(event, "已切換：GPT 中越雙向 🇹🇼↔️🇻🇳");
       return res.status(200).end();
     }
 
     if (text === "設定 中英") {
       userMode[key] = "zh-en";
-      await replyText(event, "已切換：中英雙向 🇹🇼↔️🇺🇸\n中文會翻英文，英文會翻中文");
+      await replyText(event, "已切換：GPT 中英雙向 🇹🇼↔️🇺🇸");
       return res.status(200).end();
     }
 
     if (text === "設定 多國") {
       userMode[key] = "multi";
-      await replyText(event, "已切換：多國翻譯 🌍\n中文會翻泰文、越文、英文");
+      await replyText(event, "已切換：GPT 多國翻譯 🌍");
       return res.status(200).end();
     }
 
@@ -134,36 +118,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       return res.status(200).end();
     }
 
-    if (mode === "multi") {
-      const [th] = await translate.translate(text, "th");
-      const [vi] = await translate.translate(text, "vi");
-      const [en] = await translate.translate(text, "en");
-
-      await replyText(
-        event,
-        `🇹🇭 泰文：${th}\n\n🇻🇳 越文：${vi}\n\n🇺🇸 英文：${en}`
-      );
-
-      return res.status(200).end();
-    }
-
-    const lang = await detectLanguage(text);
-
-    let target = "zh-TW";
-
-    if (mode === "zh-th") {
-      target = lang.includes("zh") ? "th" : "zh-TW";
-    }
-
-    if (mode === "zh-vi") {
-      target = lang.includes("zh") ? "vi" : "zh-TW";
-    }
-
-    if (mode === "zh-en") {
-      target = lang.includes("zh") ? "en" : "zh-TW";
-    }
-
-    const [translated] = await translate.translate(text, target);
+    const translated = await gptTranslate(text, mode);
     await replyText(event, translated);
 
     return res.status(200).end();
@@ -175,7 +130,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("LINE Translator Bot Running");
+  res.send("LINE GPT Translator Bot Running");
 });
 
 app.listen(process.env.PORT || 3000, () => {
