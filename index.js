@@ -84,9 +84,21 @@ async function gptTranslate(text, mode) {
 
   const response = await openai.responses.create({
     
-const mode = userMode[key] || "zh-th";
-  return response.output_text.trim();
-}
+const response = await openai.responses.create({
+  model: "gpt-4.1-mini",
+  input: [
+    {
+      role: "system",
+      content: instructions[mode]
+    },
+    {
+      role: "user",
+      content: text
+    }
+  ]
+});
+
+return response.output_text.trim();
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
