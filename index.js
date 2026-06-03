@@ -17,11 +17,19 @@ const translate = new Translate({
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
-    const event = req.body.events[0];
+    const event = req.body.events && req.body.events[0];
 
-    if (event.type !== "message" ||!event.message || event.message.type !== "text") {
-      return res.status(200).end();
-    }
+if (!event) {
+  return res.status(200).end();
+}
+
+if (
+  event.type !== "message" ||
+  !event.message ||
+  event.message.type !== "text"
+) {
+  return res.status(200).end();
+}
 
     const userText = event.message.text;
 
