@@ -83,22 +83,21 @@ async function gptTranslate(text, mode) {
   };
 
   const response = await openai.responses.create({
-    
-const response = await openai.responses.create({
-  model: "gpt-4.1-mini",
-  input: [
-    {
-      role: "system",
-      content: instructions[mode]
-    },
-    {
-      role: "user",
-      content: text
-    }
-  ]
-});
+    model: "gpt-4.1-mini",
+    input: [
+      {
+        role: "system",
+        content: instructions[mode]
+      },
+      {
+        role: "user",
+        content: text
+      }
+    ]
+  });
 
-return response.output_text.trim();
+  return response.output_text.trim();
+}
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
@@ -170,15 +169,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       return res.status(200).end();
     }
 
-    const mode = userMode[key];
-
-    if (!mode) {
-      if (!userMode[key + "_menuShown"]) {
-        userMode[key + "_menuShown"] = true;
-        await client.replyMessage(event.replyToken, menuFlex());
-      }
-      return res.status(200).end();
-    }
+    const mode = userMode[key] || "zh-th";
 
     const translated = await gptTranslate(text, mode);
     await replyText(event, translated);
