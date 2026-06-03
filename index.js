@@ -21,7 +21,7 @@ function getUserKey(event) {
 function menuFlex() {
   return {
     type: "flex",
-    altText: "選擇語言",
+    altText: "選擇翻譯模式",
     contents: {
       type: "bubble",
       body: {
@@ -31,7 +31,7 @@ function menuFlex() {
         contents: [
           {
             type: "text",
-            text: "🌏 多國翻譯",
+            text: "🌏 雙向翻譯",
             weight: "bold",
             size: "xl",
             align: "center"
@@ -40,60 +40,24 @@ function menuFlex() {
             type: "button",
             action: {
               type: "message",
-              label: "🇹🇭 翻成泰文",
-              text: "設定 泰文"
+              label: "🇹🇭 中泰雙向",
+              text: "設定 中泰"
             }
           },
           {
             type: "button",
             action: {
               type: "message",
-              label: "🇻🇳 翻成越文",
-              text: "設定 越文"
+              label: "🇻🇳 中越雙向",
+              text: "設定 中越"
             }
           },
           {
             type: "button",
             action: {
               type: "message",
-              label: "🇺🇸 翻成英文",
-              text: "設定 英文"
-            }
-          },
-          {
-            type: "button",
-            action: {
-              type: "message",
-              label: "🇹🇼 翻成中文",
-              text: "設定 中文"
-            }
-          },
-          {
-            type: "separator",
-            margin: "md"
-          },
-          {
-            type: "button",
-            action: {
-              type: "message",
-              label: "🇹🇭➡️🇹🇼 泰翻中",
-              text: "設定 泰翻中"
-            }
-          },
-          {
-            type: "button",
-            action: {
-              type: "message",
-              label: "🇻🇳➡️🇹🇼 越翻中",
-              text: "設定 越翻中"
-            }
-          },
-          {
-            type: "button",
-            action: {
-              type: "message",
-              label: "🇺🇸➡️🇹🇼 英翻中",
-              text: "設定 英翻中"
+              label: "🇺🇸 中英雙向",
+              text: "設定 中英"
             }
           },
           {
@@ -118,6 +82,11 @@ async function replyText(event, text) {
   });
 }
 
+async function detectLanguage(text) {
+  const [detect] = await translate.detect(text);
+  return detect.language;
+}
+
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
     const event = req.body.events[0];
@@ -129,61 +98,32 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     const text = event.message.text.trim();
     const key = getUserKey(event);
 
-    if (
-      text === "選單" ||
-      text === "menu" ||
-      text === "開始" ||
-      text === "?"
-    ) {
+    if (text === "選單" || text === "menu" || text === "開始" || text === "?") {
       await client.replyMessage(event.replyToken, menuFlex());
       return res.status(200).end();
     }
 
-    if (text === "設定 泰文") {
-      userMode[key] = "th";
-      await replyText(event, "已切換：翻成泰文 🇹🇭\n請直接輸入要翻譯的文字");
+    if (text === "設定 中泰") {
+      userMode[key] = "zh-th";
+      await replyText(event, "已切換：中泰雙向 🇹🇼↔️🇹🇭\n中文會翻泰文，泰文會翻中文");
       return res.status(200).end();
     }
 
-    if (text === "設定 越文") {
-      userMode[key] = "vi";
-      await replyText(event, "已切換：翻成越文 🇻🇳\n請直接輸入要翻譯的文字");
+    if (text === "設定 中越") {
+      userMode[key] = "zh-vi";
+      await replyText(event, "已切換：中越雙向 🇹🇼↔️🇻🇳\n中文會翻越文，越文會翻中文");
       return res.status(200).end();
     }
 
-    if (text === "設定 英文") {
-      userMode[key] = "en";
-      await replyText(event, "已切換：翻成英文 🇺🇸\n請直接輸入要翻譯的文字");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 中文") {
-      userMode[key] = "zh-TW";
-      await replyText(event, "已切換：翻成中文 🇹🇼\n請直接輸入要翻譯的文字");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 泰翻中") {
-      userMode[key] = "thai2zh";
-      await replyText(event, "已切換：泰文翻中文 🇹🇭➡️🇹🇼\n請直接輸入泰文");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 越翻中") {
-      userMode[key] = "viet2zh";
-      await replyText(event, "已切換：越文翻中文 🇻🇳➡️🇹🇼\n請直接輸入越文");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 英翻中") {
-      userMode[key] = "eng2zh";
-      await replyText(event, "已切換：英文翻中文 🇺🇸➡️🇹🇼\n請直接輸入英文");
+    if (text === "設定 中英") {
+      userMode[key] = "zh-en";
+      await replyText(event, "已切換：中英雙向 🇹🇼↔️🇺🇸\n中文會翻英文，英文會翻中文");
       return res.status(200).end();
     }
 
     if (text === "設定 多國") {
       userMode[key] = "multi";
-      await replyText(event, "已切換：多國翻譯 🌍\n請直接輸入要翻譯的文字");
+      await replyText(event, "已切換：多國翻譯 🌍\n中文會翻泰文、越文、英文");
       return res.status(200).end();
     }
 
@@ -198,27 +138,32 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       const [th] = await translate.translate(text, "th");
       const [vi] = await translate.translate(text, "vi");
       const [en] = await translate.translate(text, "en");
-      const [zh] = await translate.translate(text, "zh-TW");
 
       await replyText(
         event,
-        `🇹🇭 泰文：${th}\n\n🇻🇳 越文：${vi}\n\n🇺🇸 英文：${en}\n\n🇹🇼 中文：${zh}`
+        `🇹🇭 泰文：${th}\n\n🇻🇳 越文：${vi}\n\n🇺🇸 英文：${en}`
       );
 
       return res.status(200).end();
     }
 
-    if (
-      mode === "thai2zh" ||
-      mode === "viet2zh" ||
-      mode === "eng2zh"
-    ) {
-      const [translated] = await translate.translate(text, "zh-TW");
-      await replyText(event, translated);
-      return res.status(200).end();
+    const lang = await detectLanguage(text);
+
+    let target = "zh-TW";
+
+    if (mode === "zh-th") {
+      target = lang.includes("zh") ? "th" : "zh-TW";
     }
 
-    const [translated] = await translate.translate(text, mode);
+    if (mode === "zh-vi") {
+      target = lang.includes("zh") ? "vi" : "zh-TW";
+    }
+
+    if (mode === "zh-en") {
+      target = lang.includes("zh") ? "en" : "zh-TW";
+    }
+
+    const [translated] = await translate.translate(text, target);
     await replyText(event, translated);
 
     return res.status(200).end();
