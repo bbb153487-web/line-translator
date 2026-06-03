@@ -6,10 +6,11 @@ const flex = {
     body: {
       type: "box",
       layout: "vertical",
+      spacing: "md",
       contents: [
         {
           type: "text",
-          text: "Choose Language",
+          text: "🌏 多國翻譯",
           weight: "bold",
           size: "xl"
         },
@@ -17,7 +18,7 @@ const flex = {
           type: "button",
           action: {
             type: "message",
-            label: "泰文",
+            label: "🇹🇭 泰文",
             text: "設定 泰文"
           }
         },
@@ -25,7 +26,7 @@ const flex = {
           type: "button",
           action: {
             type: "message",
-            label: "越文",
+            label: "🇻🇳 越文",
             text: "設定 越文"
           }
         },
@@ -33,8 +34,25 @@ const flex = {
           type: "button",
           action: {
             type: "message",
-            label: "英文",
+            label: "🇺🇸 英文",
             text: "設定 英文"
+          }
+        },
+        {
+          type: "button",
+          action: {
+            type: "message",
+            label: "🇨🇳 中文",
+            text: "設定 中文"
+          }
+        },
+        {
+          type: "button",
+          style: "primary",
+          action: {
+            type: "message",
+            label: "🌍 多國翻譯",
+            text: "設定 多國"
           }
         }
       ]
