@@ -5,7 +5,7 @@ const { Translate } = require("@google-cloud/translate").v2;
 const app = express();
 
 const config = {
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
+  channelAccessToken: process.env.LINE_ACCESS_TOKEN,
   channelSecret: process.env.LINE_CHANNEL_SECRET
 };
 
@@ -17,34 +17,38 @@ const translate = new Translate({
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
-    const event = req.body.events && req.body.events[0];
+    const event = req.body.events[0];
 
-if (!event) {
-  return res.status(200).end();
-}
+    if (event.type !== "message" || event.message.type !== "text") {
+      return res.status(200).end();
+    }
 
-if (
-  event.type !== "message" ||
-  !event.message ||
-  event.message.type !== "text"
-) {
-  return res.status(200).end();
-}
+    const text = event.message.text;
+    const [detect] = await translate.detect(text);
+    const lang = detect.language;
 
-    const userText = event.message.text;
+    let reply = "";
 
-    const [translated] = await translate.translate(userText, "zh-TW");
+    if (lang.includes("zh")) {
+      const [th] = await translate.translate(text, "th");
+      const [vi] = await translate.translate(text, "vi");
+      const [en] = await translate.translate(text, "en");
+
+      reply = `泰文：${th}\n越文：${vi}\n英文：${en}`;
+    } else {
+      const [zh] = await translate.translate(text, "zh-TW");
+      reply = `中文：${zh}`;
+    }
 
     await client.replyMessage(event.replyToken, {
       type: "text",
-      text: translated
+      text: reply
     });
 
     res.status(200).end();
-
   } catch (err) {
     console.log(err);
-    res.status(500).end();
+    res.status(200).end();
   }
 });
 
@@ -52,8 +56,6 @@ app.get("/", (req, res) => {
   res.send("LINE Translator Bot Running");
 });
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
+app.listen(process.env.PORT || 3000, () => {
   console.log("Server running");
 });
