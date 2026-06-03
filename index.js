@@ -15,6 +15,9 @@ const translate = new Translate({
   key: process.env.GOOGLE_API_KEY
 });
 
+// 暫時記住每個使用者選的語言
+const userMode = {};
+
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
     const event = req.body.events[0];
@@ -23,53 +26,78 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       return res.status(200).end();
     }
 
+    const userId = event.source.userId;
     const text = event.message.text.trim();
 
-    let target = "";
-    let content = "";
-
-    if (text.startsWith("泰文 ")) {
-      target = "th";
-      content = text.replace("泰文 ", "");
-    } else if (text.startsWith("越文 ")) {
-      target = "vi";
-      content = text.replace("越文 ", "");
-    } else if (text.startsWith("英文 ")) {
-      target = "en";
-      content = text.replace("英文 ", "");
-    } else if (text.startsWith("中文 ")) {
-      target = "zh-TW";
-      content = text.replace("中文 ", "");
-    } else if (text.startsWith("多國 ")) {
-      content = text.replace("多國 ", "");
-
-      const [th] = await translate.translate(content, "th");
-      const [vi] = await translate.translate(content, "vi");
-      const [en] = await translate.translate(content, "en");
-
+    if (text === "泰文") {
+      userMode[userId] = "th";
       await client.replyMessage(event.replyToken, {
         type: "text",
-        text: `泰文：${th}\n\n越文：${vi}\n\n英文：${en}`
+        text: "已切換：泰文翻譯模式\n請輸入要翻譯的內容"
       });
-
-      return res.status(200).end();
-    } else {
-      await client.replyMessage(event.replyToken, {
-        type: "text",
-        text:
-`請選擇翻譯方式：
-
-泰文 你好
-越文 你好
-英文 你好
-中文 hello
-多國 你好`
-      });
-
       return res.status(200).end();
     }
 
-    const [translated] = await translate.translate(content, target);
+    if (text === "越文") {
+      userMode[userId] = "vi";
+      await client.replyMessage(event.replyToken, {
+        type: "text",
+        text: "已切換：越文翻譯模式\n請輸入要翻譯的內容"
+      });
+      return res.status(200).end();
+    }
+
+    if (text === "英文") {
+      userMode[userId] = "en";
+      await client.replyMessage(event.replyToken, {
+        type: "text",
+        text: "已切換：英文翻譯模式\n請輸入要翻譯的內容"
+      });
+      return res.status(200).end();
+    }
+
+    if (text === "中文") {
+      userMode[userId] = "zh-TW";
+      await client.replyMessage(event.replyToken, {
+        type: "text",
+        text: "已切換：中文翻譯模式\n請輸入要翻譯的內容"
+      });
+      return res.status(200).end();
+    }
+
+    if (text === "多國") {
+      userMode[userId] = "multi";
+      await client.replyMessage(event.replyToken, {
+        type: "text",
+        text: "已切換：多國翻譯模式\n請輸入要翻譯的內容"
+      });
+      return res.status(200).end();
+    }
+
+    const mode = userMode[userId];
+
+    if (!mode) {
+      await client.replyMessage(event.replyToken, {
+        type: "text",
+        text: "請先點選下方選單：泰文、越文、英文、中文或多國"
+      });
+      return res.status(200).end();
+    }
+
+    if (mode === "multi") {
+      const [th] = await translate.translate(text, "th");
+      const [vi] = await translate.translate(text, "vi");
+      const [en] = await translate.translate(text, "en");
+      const [zh] = await translate.translate(text, "zh-TW");
+
+      await client.replyMessage(event.replyToken, {
+        type: "text",
+        text: `泰文：${th}\n\n越文：${vi}\n\n英文：${en}\n\n中文：${zh}`
+      });
+      return res.status(200).end();
+    }
+
+    const [translated] = await translate.translate(text, mode);
 
     await client.replyMessage(event.replyToken, {
       type: "text",
