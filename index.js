@@ -111,12 +111,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       return res.status(200).end();
     }
 
-    const mode = userMode[key];
-
-    if (!mode) {
-      await client.replyMessage(event.replyToken, menuFlex());
-      return res.status(200).end();
-    }
+    const mode = userMode[key] || "zh-th";
 
     const translated = await gptTranslate(text, mode);
     await replyText(event, translated);
