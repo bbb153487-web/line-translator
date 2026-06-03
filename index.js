@@ -34,7 +34,7 @@ function menuFlex() {
         contents: [
           {
             type: "text",
-            text: "🌏 GPT 多語雙向翻譯",
+            text: "🌏 多語雙向翻譯",
             weight: "bold",
             size: "xl",
             align: "center"
