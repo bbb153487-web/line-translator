@@ -83,19 +83,8 @@ async function gptTranslate(text, mode) {
   };
 
   const response = await openai.responses.create({
-    model: "gpt-4.1-mini",
-    input: [
-      {
-        role: "system",
-        content: instructions[mode]
-      },
-      {
-        role: "user",
-        content: text
-      }
-    ]
-  });
-
+    
+const mode = userMode[key] || "zh-th";
   return response.output_text.trim();
 }
 
