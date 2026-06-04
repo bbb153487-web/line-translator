@@ -14,7 +14,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-app.use(express.json());
 
 const userMode = {};
 const appUsage = {};
@@ -159,7 +158,7 @@ async function gptTranslate(text, mode, targetLanguage) {
   return response.output_text.trim();
 }
 
-app.post("/translate", async (req, res) => {
+app.post("/translate", express.json(), async (req, res) => {
   try {
     const {
       userId = "guest",
@@ -202,7 +201,6 @@ app.post("/translate", async (req, res) => {
 });
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
-  try {
     const event = req.body.events[0];
 
     if (!event || event.type !== "message" || event.message.type !== "text") {
