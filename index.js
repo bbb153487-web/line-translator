@@ -101,7 +101,15 @@ async function gptTranslate(text, mode) {
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
-    const event = req.body.events[0];
+  const event = req.body.events[0];
+
+if (!event || event.type !== "message" || event.message.type !== "text") {
+  return res.status(200).end();
+}
+
+
+const text = event.message.text.trim();
+const key = getUserKey(event);
 
     if (text === "選單" || text === "menu" || text === "開始" || text === "?") {
       await client.replyMessage(event.replyToken, menuFlex());
