@@ -10,10 +10,7 @@ const config = {
 };
 
 const client = new line.Client(config);
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const userMode = {};
 
@@ -32,30 +29,17 @@ function menuFlex() {
         layout: "vertical",
         spacing: "sm",
         contents: [
-          {
-            type: "text",
-            text: "🌏 多語翻譯",
-            weight: "bold",
-            size: "xl",
-            align: "center"
-          },
-          { type: "button", action: { type: "message", label: "🇹🇭 中泰翻譯", text: "設定 中泰" } },
-          { type: "button", action: { type: "message", label: "🇻🇳 中越翻譯", text: "設定 中越" } },
-          { type: "button", action: { type: "message", label: "🇺🇸 中英翻譯", text: "設定 中英" } },
-          { type: "button", action: { type: "message", label: "🇯🇵 中日翻譯", text: "設定 中日" } },
-          { type: "button", action: { type: "message", label: "🇰🇷 中韓翻譯", text: "設定 中韓" } },
-          { type: "button", action: { type: "message", label: "🇵🇭 中菲翻譯", text: "設定 中菲" } },
-          { type: "button", action: { type: "message", label: "🇲🇲 中緬翻譯", text: "設定 中緬" } },
-          { type: "button", action: { type: "message", label: "🇷🇺 中俄翻譯", text: "設定 中俄" } },
-          {
-            type: "button",
-            style: "primary",
-            action: {
-              type: "message",
-              label: "🌍 多國翻譯",
-              text: "設定 多國"
-            }
-          }
+          { type: "text", text: "🌏 MO 自動翻譯", weight: "bold", size: "xl", align: "center" },
+          { type: "button", action: { type: "message", label: "🤖 自動翻譯", text: "設定 自動" } },
+          { type: "button", action: { type: "message", label: "🇹🇭 中泰雙向", text: "設定 中泰" } },
+          { type: "button", action: { type: "message", label: "🇻🇳 中越雙向", text: "設定 中越" } },
+          { type: "button", action: { type: "message", label: "🇺🇸 中英雙向", text: "設定 中英" } },
+          { type: "button", action: { type: "message", label: "🇯🇵 中日雙向", text: "設定 中日" } },
+          { type: "button", action: { type: "message", label: "🇰🇷 中韓雙向", text: "設定 中韓" } },
+          { type: "button", action: { type: "message", label: "🇵🇭 中菲雙向", text: "設定 中菲" } },
+          { type: "button", action: { type: "message", label: "🇲🇲 中緬雙向", text: "設定 中緬" } },
+          { type: "button", action: { type: "message", label: "🇷🇺 中俄雙向", text: "設定 中俄" } },
+          { type: "button", style: "primary", action: { type: "message", label: "🌍 多國翻譯", text: "設定 多國" } }
         ]
       }
     }
@@ -63,58 +47,55 @@ function menuFlex() {
 }
 
 async function replyText(event, text) {
-  return client.replyMessage(event.replyToken, {
-    type: "text",
-    text
-  });
+  return client.replyMessage(event.replyToken, { type: "text", text });
 }
-const DEFAULT_LANGUAGE = "zh-TW";
+
 async function gptTranslate(text, mode) {
   const instructions = {
-  "auto": `
-你是專業口語翻譯機，使用在 LINE 群組與私人聊天。
+    auto: `
+你是專業 LINE 群組翻譯機。
 
-翻譯規則：
-
+規則：
 1. 自動偵測輸入語言。
-2. 中文（繁體、簡體）翻譯成自然英文。
-3. 泰文、越南文、英文、日文、韓文、菲律賓文(Tagalog)、緬甸文、俄文翻譯成自然繁體中文。
-4. 保留原本語氣與情緒，例如撒嬌、生氣、客氣、命令、玩笑。
-5. 不要逐字翻譯，要翻成當地人實際會說的自然口語。
-6. 人名、地名、店名、公司名、日期、時間、數字、金額不可任意修改。
-7. 不確定的專有名詞可保留原文。
-8. 不要解釋翻譯內容。
-9. 不要加括號。
-10. 不要加註解。
-11. 不要顯示語言名稱。
-12. 不要補充額外資訊。
-13. 如果輸入已經是目標語言，直接原樣輸出，不要重複翻譯。
+2. 中文（繁體或簡體）翻譯成自然泰文。
+3. 泰文、越南文、英文、日文、韓文、菲律賓文 Tagalog、緬甸文、俄文，一律翻譯成自然繁體中文。
+4. 如果文字是人名、地名、店名、品牌名、數字、日期、時間、金額，請保留，不要亂改。
+5. 保留原本語氣，例如客氣、生氣、撒嬌、命令、開玩笑。
+6. 不要逐字硬翻，要翻成自然口語。
+7. 不要解釋，不要加括號，不要加註解。
+8. 如果是表情符號或無意義文字，不要翻譯，原樣輸出。
+9. 只輸出翻譯結果。
+`,
+    "zh-th": "中文翻譯成自然泰文；泰文翻譯成自然繁體中文。只輸出翻譯結果。",
+    "zh-vi": "中文翻譯成自然越南文；越南文翻譯成自然繁體中文。只輸出翻譯結果。",
+    "zh-en": "中文翻譯成自然英文；英文翻譯成自然繁體中文。只輸出翻譯結果。",
+    "zh-ja": "中文翻譯成自然日文；日文翻譯成自然繁體中文。只輸出翻譯結果。",
+    "zh-ko": "中文翻譯成自然韓文；韓文翻譯成自然繁體中文。只輸出翻譯結果。",
+    "zh-tl": "中文翻譯成自然菲律賓文 Tagalog；菲律賓文 Tagalog 翻譯成自然繁體中文。只輸出翻譯結果。",
+    "zh-my": "中文翻譯成自然緬甸文；緬甸文翻譯成自然繁體中文。只輸出翻譯結果。",
+    "zh-ru": "中文翻譯成自然俄文；俄文翻譯成自然繁體中文。只輸出翻譯結果。",
+    multi: `
+請把使用者文字翻譯成以下語言，每種都要輸出：
+
+🇹🇭 泰文：
+🇻🇳 越文：
+🇺🇸 英文：
+🇯🇵 日文：
+🇰🇷 韓文：
+🇵🇭 菲律賓文：
+🇲🇲 緬甸文：
+🇷🇺 俄文：
+🇹🇼 中文：
 
 只輸出翻譯結果。
-`,
-
-  "zh-th": "你是專業中文泰文雙向翻譯。若輸入是中文，翻成自然泰文；若輸入是泰文，翻成自然繁體中文。只輸出翻譯結果。",
-  "zh-vi": "你是專業中文越南文雙向翻譯。若輸入是中文，翻成自然越南文；若輸入是越南文，翻成自然繁體中文。只輸出翻譯結果。",
-  "zh-en": "你是專業中文英文雙向翻譯。若輸入是中文，翻成自然英文；若輸入是英文，翻成自然繁體中文。只輸出翻譯結果。",
-  "zh-ja": "你是專業中文日文雙向翻譯。若輸入是中文，翻成自然日文；若輸入是日文，翻成自然繁體中文。只輸出翻譯結果。",
-  "zh-ko": "你是專業中文韓文雙向翻譯。若輸入是中文，翻成自然韓文；若輸入是韓文，翻成自然繁體中文。只輸出翻譯結果。",
-  "zh-tl": "你是專業中文菲律賓文 Tagalog 雙向翻譯。若輸入是中文，翻成自然菲律賓文 Tagalog；若輸入是菲律賓文 Tagalog，翻成自然繁體中文。只輸出翻譯結果。",
-  "zh-my": "你是專業中文緬甸文雙向翻譯。若輸入是中文，翻成自然緬甸文；若輸入是緬甸文，翻成自然繁體中文。只輸出翻譯結果。",
-  "zh-ru": "你是專業中文俄文雙向翻譯。若輸入是中文，翻成自然俄文；若輸入是俄文，翻成自然繁體中文。只輸出翻譯結果。",
-  "multi": "請把使用者文字翻譯成泰文、越南文、英文、日文、韓文、菲律賓文Tagalog、緬甸文、俄文、繁體中文。只輸出翻譯結果。"
-};
+`
+  };
 
   const response = await openai.responses.create({
     model: "gpt-4.1-mini",
     input: [
-      {
-        role: "system",
-        content: instructions[mode]
-      },
-      {
-        role: "user",
-        content: text
-      }
+      { role: "system", content: instructions[mode] || instructions.auto },
+      { role: "user", content: text }
     ]
   });
 
@@ -123,80 +104,49 @@ async function gptTranslate(text, mode) {
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
-  const event = req.body.events[0];
+    const event = req.body.events[0];
 
-if (!event || event.type !== "message" || event.message.type !== "text") {
-  return res.status(200).end();
-}
+    if (!event || event.type !== "message" || event.message.type !== "text") {
+      return res.status(200).end();
+    }
 
+    const text = event.message.text.trim();
+    const key = getUserKey(event);
 
-const text = event.message.text.trim();
-const key = getUserKey(event);
+    if (!text) return res.status(200).end();
 
-    if (text === "選單" || text === "menu" || text === "開始" || text === "?") {
+    if (["選單", "menu", "開始", "?"].includes(text)) {
       await client.replyMessage(event.replyToken, menuFlex());
       return res.status(200).end();
     }
 
-    if (text === "設定 中泰") {
-      userMode[key] = "zh-th";
-      await replyText(event, "已切換：中泰翻譯 🇹🇼↔️🇹🇭");
-      return res.status(200).end();
-    }
+    const modes = {
+      "設定 自動": ["auto", "已切換：自動翻譯 🤖"],
+      "設定 中泰": ["zh-th", "已切換：中泰雙向 🇹🇼↔️🇹🇭"],
+      "設定 中越": ["zh-vi", "已切換：中越雙向 🇹🇼↔️🇻🇳"],
+      "設定 中英": ["zh-en", "已切換：中英雙向 🇹🇼↔️🇺🇸"],
+      "設定 中日": ["zh-ja", "已切換：中日雙向 🇹🇼↔️🇯🇵"],
+      "設定 中韓": ["zh-ko", "已切換：中韓雙向 🇹🇼↔️🇰🇷"],
+      "設定 中菲": ["zh-tl", "已切換：中菲雙向 🇹🇼↔️🇵🇭"],
+      "設定 中緬": ["zh-my", "已切換：中緬雙向 🇹🇼↔️🇲🇲"],
+      "設定 中俄": ["zh-ru", "已切換：中俄雙向 🇹🇼↔️🇷🇺"],
+      "設定 多國": ["multi", "已切換：多國翻譯 🌍"]
+    };
 
-    if (text === "設定 中越") {
-      userMode[key] = "zh-vi";
-      await replyText(event, "已切換：中越翻譯 🇹🇼↔️🇻🇳");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 中英") {
-      userMode[key] = "zh-en";
-      await replyText(event, "已切換：中英翻譯 🇹🇼↔️🇺🇸");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 中日") {
-      userMode[key] = "zh-ja";
-      await replyText(event, "已切換：中日翻譯 🇹🇼↔️🇯🇵");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 中韓") {
-      userMode[key] = "zh-ko";
-      await replyText(event, "已切換：中韓翻譯 🇹🇼↔️🇰🇷");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 中菲") {
-      userMode[key] = "zh-tl";
-      await replyText(event, "已切換：中菲翻譯 🇹🇼↔️🇵🇭");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 中緬") {
-      userMode[key] = "zh-my";
-      await replyText(event, "已切換：中緬翻譯 🇹🇼↔️🇲🇲");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 中俄") {
-      userMode[key] = "zh-ru";
-      await replyText(event, "已切換：中俄翻譯 🇹🇼↔️🇷🇺");
-      return res.status(200).end();
-    }
-
-    if (text === "設定 多國") {
-      userMode[key] = "multi";
-      await replyText(event, "已切換： 多國翻譯 🌍");
+    if (modes[text]) {
+      userMode[key] = modes[text][0];
+      await replyText(event, modes[text][1]);
       return res.status(200).end();
     }
 
     const mode = userMode[key] || "auto";
-
     const translated = await gptTranslate(text, mode);
-    await replyText(event, translated);
 
+    if (!translated || translated === text) {
+      return res.status(200).end();
+    }
+
+    await replyText(event, translated);
     return res.status(200).end();
 
   } catch (err) {
