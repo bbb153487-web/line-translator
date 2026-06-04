@@ -105,7 +105,7 @@ async function gptTranslate(text, mode) {
 };
 
   const response = await openai.responses.create({
-    model: "gpt-4.1",
+    model: "gpt-4.1-mini"
     input: [
       {
         role: "system",
