@@ -119,55 +119,55 @@ const key = getUserKey(event);
 
     if (text === "設定 中泰") {
       userMode[key] = "zh-th";
-      await replyText(event, "已切換：GPT 中泰雙向 🇹🇼↔️🇹🇭");
+      await replyText(event, "已切換：中泰雙向 🇹🇼↔️🇹🇭");
       return res.status(200).end();
     }
 
     if (text === "設定 中越") {
       userMode[key] = "zh-vi";
-      await replyText(event, "已切換：GPT 中越雙向 🇹🇼↔️🇻🇳");
+      await replyText(event, "已切換：中越雙向 🇹🇼↔️🇻🇳");
       return res.status(200).end();
     }
 
     if (text === "設定 中英") {
       userMode[key] = "zh-en";
-      await replyText(event, "已切換：GPT 中英雙向 🇹🇼↔️🇺🇸");
+      await replyText(event, "已切換：中英雙向 🇹🇼↔️🇺🇸");
       return res.status(200).end();
     }
 
     if (text === "設定 中日") {
       userMode[key] = "zh-ja";
-      await replyText(event, "已切換：GPT 中日雙向 🇹🇼↔️🇯🇵");
+      await replyText(event, "已切換：中日雙向 🇹🇼↔️🇯🇵");
       return res.status(200).end();
     }
 
     if (text === "設定 中韓") {
       userMode[key] = "zh-ko";
-      await replyText(event, "已切換：GPT 中韓雙向 🇹🇼↔️🇰🇷");
+      await replyText(event, "已切換：中韓雙向 🇹🇼↔️🇰🇷");
       return res.status(200).end();
     }
 
     if (text === "設定 中菲") {
       userMode[key] = "zh-tl";
-      await replyText(event, "已切換：GPT 中菲雙向 🇹🇼↔️🇵🇭");
+      await replyText(event, "已切換：中菲雙向 🇹🇼↔️🇵🇭");
       return res.status(200).end();
     }
 
     if (text === "設定 中緬") {
       userMode[key] = "zh-my";
-      await replyText(event, "已切換：GPT 中緬雙向 🇹🇼↔️🇲🇲");
+      await replyText(event, "已切換：中緬雙向 🇹🇼↔️🇲🇲");
       return res.status(200).end();
     }
 
     if (text === "設定 中俄") {
       userMode[key] = "zh-ru";
-      await replyText(event, "已切換：GPT 中俄雙向 🇹🇼↔️🇷🇺");
+      await replyText(event, "已切換：中俄雙向 🇹🇼↔️🇷🇺");
       return res.status(200).end();
     }
 
     if (text === "設定 多國") {
       userMode[key] = "multi";
-      await replyText(event, "已切換：GPT 多國翻譯 🌍");
+      await replyText(event, "已切換： 多國翻譯 🌍");
       return res.status(200).end();
     }
 
