@@ -68,7 +68,7 @@ async function replyText(event, text) {
     text
   });
 }
-
+const DEFAULT_LANGUAGE = "zh-TW";
 async function gptTranslate(text, mode) {
   const instructions = {
     "zh-th": "你是專業中文泰文雙向翻譯。若輸入是中文，翻成自然泰文；若輸入是泰文，翻成自然繁體中文。只輸出翻譯結果。",
