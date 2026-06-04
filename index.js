@@ -10,9 +10,55 @@ const config = {
 };
 
 const client = new line.Client(config);
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+app.use(express.json());
 
 const userMode = {};
+const appUsage = {};
+
+const FREE_DAILY_LIMIT = 20;
+
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function checkDailyLimit(userId) {
+  const today = todayKey();
+
+  if (!appUsage[userId]) {
+    appUsage[userId] = {
+      date: today,
+      count: 0
+    };
+  }
+
+  if (appUsage[userId].date !== today) {
+    appUsage[userId] = {
+      date: today,
+      count: 0
+    };
+  }
+
+  if (appUsage[userId].count >= FREE_DAILY_LIMIT) {
+    return false;
+  }
+
+  appUsage[userId].count += 1;
+  return true;
+}
+
+function getRemainingCount(userId) {
+  const today = todayKey();
+
+  if (!appUsage[userId] || appUsage[userId].date !== today) {
+    return FREE_DAILY_LIMIT;
+  }
+
+  return Math.max(0, FREE_DAILY_LIMIT - appUsage[userId].count);
+}
 
 function getUserKey(event) {
   return event.source.groupId || event.source.roomId || event.source.userId;
@@ -47,17 +93,20 @@ function menuFlex() {
 }
 
 async function replyText(event, text) {
-  return client.replyMessage(event.replyToken, { type: "text", text });
+  return client.replyMessage(event.replyToken, {
+    type: "text",
+    text
+  });
 }
 
-async function gptTranslate(text, mode) {
+async function gptTranslate(text, mode, targetLanguage) {
   const instructions = {
     auto: `
-你是專業 LINE 群組翻譯機。
+你是專業翻譯機。
 
 規則：
 1. 自動偵測輸入語言。
-2. 中文（繁體或簡體）翻譯成自然泰文。
+2. 中文翻譯成自然泰文。
 3. 泰文、越南文、英文、日文、韓文、菲律賓文 Tagalog、緬甸文、俄文，一律翻譯成自然繁體中文。
 4. 如果文字是人名、地名、店名、品牌名、數字、日期、時間、金額，請保留，不要亂改。
 5. 保留原本語氣，例如客氣、生氣、撒嬌、命令、開玩笑。
@@ -88,19 +137,69 @@ async function gptTranslate(text, mode) {
 🇹🇼 中文：
 
 只輸出翻譯結果。
-`
+`,
+    app: `你是專業翻譯 App。請把使用者文字翻譯成${targetLanguage}。
+只輸出翻譯結果，不要解釋，不要加註解。`
   };
 
   const response = await openai.responses.create({
     model: "gpt-4.1-mini",
     input: [
-      { role: "system", content: instructions[mode] || instructions.auto },
-      { role: "user", content: text }
+      {
+        role: "system",
+        content: targetLanguage ? instructions.app : instructions[mode] || instructions.auto
+      },
+      {
+        role: "user",
+        content: text
+      }
     ]
   });
 
   return response.output_text.trim();
 }
+
+app.post("/translate", async (req, res) => {
+  try {
+    const {
+      userId = "guest",
+      text,
+      targetLanguage = "繁體中文",
+      isVip = false
+    } = req.body;
+
+    if (!text) {
+      return res.status(400).json({
+        error: "缺少 text"
+      });
+    }
+
+    if (!isVip) {
+      const allowed = checkDailyLimit(userId);
+
+      if (!allowed) {
+        return res.status(429).json({
+          error: "今日免費翻譯次數已用完",
+          remaining: 0,
+          limit: FREE_DAILY_LIMIT
+        });
+      }
+    }
+
+    const translatedText = await gptTranslate(text, "app", targetLanguage);
+
+    return res.json({
+      translatedText,
+      remaining: isVip ? "VIP" : getRemainingCount(userId),
+      limit: isVip ? "VIP" : FREE_DAILY_LIMIT
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "翻譯失敗"
+    });
+  }
+});
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
@@ -148,7 +247,6 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     await replyText(event, translated);
     return res.status(200).end();
-
   } catch (err) {
     console.error(err);
     return res.status(200).end();
@@ -156,7 +254,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("LINE GPT Translator Bot Running");
+  res.send("LINE GPT Translator Bot + App API Running");
 });
 
 app.listen(process.env.PORT || 3000, () => {
