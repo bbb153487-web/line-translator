@@ -71,6 +71,7 @@ async function replyText(event, text) {
 const DEFAULT_LANGUAGE = "zh-TW";
 async function gptTranslate(text, mode) {
   const instructions = {
+    "auto": "你是專業翻譯機。中文翻譯成泰文；泰文、越南文、英文、日文、韓文、菲律賓文、緬甸文、俄文全部翻譯成繁體中文。不可解釋，只輸出翻譯結果。",
     "zh-th": "你是專業中文泰文雙向翻譯。若輸入是中文，翻成自然泰文；若輸入是泰文，翻成自然繁體中文。只輸出翻譯結果。",
     "zh-vi": "你是專業中文越南文雙向翻譯。若輸入是中文，翻成自然越南文；若輸入是越南文，翻成自然繁體中文。只輸出翻譯結果。",
     "zh-en": "你是專業中文英文雙向翻譯。若輸入是中文，翻成自然英文；若輸入是英文，翻成自然繁體中文。只輸出翻譯結果。",
@@ -170,7 +171,7 @@ const key = getUserKey(event);
       return res.status(200).end();
     }
 
-    const mode = userMode[key] || "zh-th";
+    const mode = userMode[key] || "auto";
 
     const translated = await gptTranslate(text, mode);
     await replyText(event, translated);
