@@ -119,49 +119,49 @@ const key = getUserKey(event);
 
     if (text === "設定 中泰") {
       userMode[key] = "zh-th";
-      await replyText(event, "已切換：中泰雙向 🇹🇼↔️🇹🇭");
+      await replyText(event, "已切換：中泰翻譯 🇹🇼↔️🇹🇭");
       return res.status(200).end();
     }
 
     if (text === "設定 中越") {
       userMode[key] = "zh-vi";
-      await replyText(event, "已切換：中越雙向 🇹🇼↔️🇻🇳");
+      await replyText(event, "已切換：中越翻譯 🇹🇼↔️🇻🇳");
       return res.status(200).end();
     }
 
     if (text === "設定 中英") {
       userMode[key] = "zh-en";
-      await replyText(event, "已切換：中英雙向 🇹🇼↔️🇺🇸");
+      await replyText(event, "已切換：中英翻譯 🇹🇼↔️🇺🇸");
       return res.status(200).end();
     }
 
     if (text === "設定 中日") {
       userMode[key] = "zh-ja";
-      await replyText(event, "已切換：中日雙向 🇹🇼↔️🇯🇵");
+      await replyText(event, "已切換：中日翻譯 🇹🇼↔️🇯🇵");
       return res.status(200).end();
     }
 
     if (text === "設定 中韓") {
       userMode[key] = "zh-ko";
-      await replyText(event, "已切換：中韓雙向 🇹🇼↔️🇰🇷");
+      await replyText(event, "已切換：中韓翻譯 🇹🇼↔️🇰🇷");
       return res.status(200).end();
     }
 
     if (text === "設定 中菲") {
       userMode[key] = "zh-tl";
-      await replyText(event, "已切換：中菲雙向 🇹🇼↔️🇵🇭");
+      await replyText(event, "已切換：中菲翻譯 🇹🇼↔️🇵🇭");
       return res.status(200).end();
     }
 
     if (text === "設定 中緬") {
       userMode[key] = "zh-my";
-      await replyText(event, "已切換：中緬雙向 🇹🇼↔️🇲🇲");
+      await replyText(event, "已切換：中緬翻譯 🇹🇼↔️🇲🇲");
       return res.status(200).end();
     }
 
     if (text === "設定 中俄") {
       userMode[key] = "zh-ru";
-      await replyText(event, "已切換：中俄雙向 🇹🇼↔️🇷🇺");
+      await replyText(event, "已切換：中俄翻譯 🇹🇼↔️🇷🇺");
       return res.status(200).end();
     }
 
