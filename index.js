@@ -256,11 +256,11 @@ ${glossary}
 只輸出翻譯結果，不要解釋。
 
 ${glossary}
-`
+`,
   };
 
   const response = await openai.responses.create({
-    model: "gpt-4.1",
+    model: "gpt-4.1-mini",
     input: [
       {
         role: "system",
