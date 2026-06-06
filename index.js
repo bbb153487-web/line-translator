@@ -356,8 +356,8 @@ if (!event || event.type !== "message" || event.message.type !== "text") {
     const mode = userMode[key] || "auto";
     const translated = await gptTranslate(text, mode);
 
-    if (!translated || translated === text) {
-      return res.status(200).end();
+    if (!translated) {
+  return res.status(200).end();
     }
 
     await replyText(event, translated);
