@@ -1,4 +1,4 @@
-^const express = require("express");
+const express = require("express");
 const line = require("@line/bot-sdk");
 const OpenAI = require("openai");
 
