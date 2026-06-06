@@ -167,7 +167,7 @@ async function gptTranslate(text, mode) {
 
 ตอนนี้มีลูกค้า
 → 現在有客人
-`
+`,
 
 
     "zh-th": `
