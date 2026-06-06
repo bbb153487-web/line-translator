@@ -43,7 +43,9 @@ function menuFlex() {
           { type: "button", action: { type: "message", label: "🇵🇭 中菲翻譯", text: "設定 中菲" } },
           { type: "button", action: { type: "message", label: "🇲🇲 中緬翻譯", text: "設定 中緬" } },
           { type: "button", action: { type: "message", label: "🇷🇺 中俄翻譯", text: "設定 中俄" } },
-
+          { type: "button", action: { type: "message", label: "🇹🇭🇺🇸 中翻泰英", text: "設定 泰英" } },
+          { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇻🇳 中翻泰英越", text: "設定 泰英越" } },
+          { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇯🇵 中翻泰英日", text: "設定 泰英日" } },
           { type: "button", action: { type: "message", label: "🇹🇭🇺🇸 泰英", text: "設定 泰英" } },
           { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇻🇳 泰英越", text: "設定 泰英越" } },
           { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇯🇵 泰英日", text: "設定 泰英日" } },
@@ -210,7 +212,34 @@ ${glossary}
 
 ${glossary}
 `,
+"zh-th-en": `
+請把文字翻譯成：
 
+🇹🇭 泰文：
+🇺🇸 英文：
+
+只輸出翻譯結果。
+`,
+
+"zh-th-en-vi": `
+請把文字翻譯成：
+
+🇹🇭 泰文：
+🇺🇸 英文：
+🇻🇳 越文：
+
+只輸出翻譯結果。
+`,
+
+"zh-th-en-ja": `
+請把文字翻譯成：
+
+🇹🇭 泰文：
+🇺🇸 英文：
+🇯🇵 日文：
+
+只輸出翻譯結果。
+`,
     multi: `
 請把使用者文字翻譯成以下語言：
 
@@ -280,7 +309,6 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       "設定 中菲": ["zh-tl", "已切換：中菲翻譯 🇹🇼↔️🇵🇭"],
       "設定 中緬": ["zh-my", "已切換：中緬翻譯 🇹🇼↔️🇲🇲"],
       "設定 中俄": ["zh-ru", "已切換：中俄翻譯 🇹🇼↔️🇷🇺"],
-
       "設定 泰英": ["zh-th-en", "已切換：泰文+英文 🇹🇭🇺🇸"],
       "設定 泰英越": ["zh-th-en-vi", "已切換：泰文+英文+越文 🇹🇭🇺🇸🇻🇳"],
       "設定 泰英日": ["zh-th-en-ja", "已切換：泰文+英文+日文 🇹🇭🇺🇸🇯🇵"],
