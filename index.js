@@ -248,18 +248,22 @@ async function gptTranslate(text, mode, targetLanguage) {
   };
 
   const response = await openai.responses.create({
-    model: "gpt-4.1,
-    input: [
-      {
-        role: "system",
-        content: targetLanguage ? instructions.app : instructions[mode] || instructions.auto
-      },
-      {
-        role: "user",
-        content: text
-      }
-    ]
-  });
+  model: "gpt-4.1",
+  input: [
+    {
+  role: "system",
+  content: `
+${instructions.auto}
+
+${targetLanguage ? instructions.app : ""}
+`
+},
+{
+  role: "user",
+  content: text
+}
+  ]
+});
 
   return response.output_text.trim();
 }
