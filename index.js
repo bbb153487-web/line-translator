@@ -253,11 +253,9 @@ async function gptTranslate(text, mode, targetLanguage) {
   input: [
     {
   role: "system",
-  content: `
-${instructions.auto}
-
-${targetLanguage ? instructions.app : ""}
-`
+  content: targetLanguage
+    ? `${instructions.auto}\n\n${instructions.app}`
+    : (instructions[mode] || instructions.auto)
 },
 {
   role: "user",
