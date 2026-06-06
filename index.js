@@ -260,7 +260,7 @@ ${glossary}
   };
 
   const response = await openai.responses.create({
-    model: "gpt-4.1,
+    model: "gpt-4.1",
     input: [
       {
         role: "system",
