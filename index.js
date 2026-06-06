@@ -114,7 +114,7 @@ async function gptTranslate(text, mode, targetLanguage) {
 8. 如果是表情符號或無意義文字，不要翻譯，原樣輸出。
 9. 若遇到特殊縮寫：
    - 3P = 三人
-   - 2S = 兩男
+   - 2S = 兩次
    - แซนวิช = 夾心
    - ช = 男
    - ญ = 女
