@@ -203,9 +203,15 @@ app.post("/translate", express.json(), async (req, res) => {
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
     const event = req.body.events[0];
-    if (!event || event.type !== "message" || event.message.type !== "text") {
-      return res.status(200).end();
-    }
+
+if (event && event.type === "join") {
+  await client.replyMessage(event.replyToken, menuFlex());
+  return res.status(200).end();
+}
+
+if (!event || event.type !== "message" || event.message.type !== "text") {
+  return res.status(200).end();
+}
 
     const text = event.message.text.trim();
     const key = getUserKey(event);
