@@ -266,20 +266,20 @@ async function gptTranslate(text, mode) {
   };
 
   const response = await openai.responses.create({
-    model: "gpt-4o-mini",
-    input: [
-      {
-        role: "system",
-        content: instructions[mode] || instructions.auto
-      },
-      {
-        role: "user",
-        content: text
-      }
-    ]
-  });
+  model: "gpt-4.1-mini",
+  input: [
+    {
+      role: "system",
+      content: instructions[mode] || instructions.auto
+    },
+    {
+      role: "user",
+      content: text
+    }
+  ]
+});
 
-  return response.output_text.trim();
+  return response.output_text?.trim() || text;
 }
 
 app.post("/webhook", line.middleware(config), async (req, res) => {
