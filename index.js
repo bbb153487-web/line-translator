@@ -23,41 +23,81 @@ function getUserKey(event) {
 function menuFlex() {
   return {
     type: "flex",
-    altText: "選擇翻譯模式",
+    altText: "MO 多語翻譯選單",
     contents: {
       type: "bubble",
+      size: "mega",
       body: {
         type: "box",
         layout: "vertical",
-        spacing: "sm",
+        spacing: "md",
         contents: [
-          { type: "text", text: "🌏 MO 多語翻譯", weight: "bold", size: "xl", align: "center" },
+          {
+            type: "text",
+            text: "🌏 MO 多語翻譯",
+            weight: "bold",
+            size: "xl",
+            align: "center",
+            color: "#1F3A5F"
+          },
+          {
+            type: "text",
+            text: "請選擇翻譯模式",
+            size: "sm",
+            align: "center",
+            color: "#888888",
+            margin: "sm"
+          },
+          { type: "separator", margin: "md" },
 
-          { type: "button", action: { type: "message", label: "🤖 自動翻譯", text: "設定 自動" } },
+          { type: "button", style: "primary", color: "#22C55E", action: { type: "message", label: "🤖 自動翻譯", text: "設定 自動" } },
 
-          { type: "button", action: { type: "message", label: "🇹🇭 中泰翻譯", text: "設定 中泰" } },
-          { type: "button", action: { type: "message", label: "🇻🇳 中越翻譯", text: "設定 中越" } },
-          { type: "button", action: { type: "message", label: "🇺🇸 中英翻譯", text: "設定 中英" } },
-          { type: "button", action: { type: "message", label: "🇯🇵 中日翻譯", text: "設定 中日" } },
-          { type: "button", action: { type: "message", label: "🇰🇷 中韓翻譯", text: "設定 中韓" } },
-          { type: "button", action: { type: "message", label: "🇵🇭 中菲翻譯", text: "設定 中菲" } },
-          { type: "button", action: { type: "message", label: "🇲🇲 中緬翻譯", text: "設定 中緬" } },
-          { type: "button", action: { type: "message", label: "🇷🇺 中俄翻譯", text: "設定 中俄" } },
-          { type: "button", action: { type: "message", label: "🇹🇭🇺🇸 中翻泰英", text: "設定 泰英" } },
-          { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇻🇳 中翻泰英越", text: "設定 泰英越" } },
-          { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇯🇵 中翻泰英日", text: "設定 泰英日" } },
-          { type: "button", action: { type: "message", label: "🇹🇭🇺🇸 泰英", text: "設定 泰英" } },
+          { type: "button", action: { type: "message", label: "🇹🇭 中泰雙向", text: "設定 中泰" } },
+          { type: "button", action: { type: "message", label: "🇻🇳 中越雙向", text: "設定 中越" } },
+          { type: "button", action: { type: "message", label: "🇺🇸 中英雙向", text: "設定 中英" } },
+          { type: "button", action: { type: "message", label: "🇯🇵 中日雙向", text: "設定 中日" } },
+          { type: "button", action: { type: "message", label: "🇰🇷 中韓雙向", text: "設定 中韓" } },
+          { type: "button", action: { type: "message", label: "🇵🇭 中菲雙向", text: "設定 中菲" } },
+          { type: "button", action: { type: "message", label: "🇲🇲 中緬雙向", text: "設定 中緬" } },
+          { type: "button", action: { type: "message", label: "🇷🇺 中俄雙向", text: "設定 中俄" } },
+
+          { type: "separator", margin: "md" },
+
+          { type: "button", action: { type: "message", label: "🇹🇭🇺🇸 泰文＋英文", text: "設定 泰英" } },
           { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇻🇳 泰英越", text: "設定 泰英越" } },
           { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇯🇵 泰英日", text: "設定 泰英日" } },
 
           {
             type: "button",
             style: "primary",
+            color: "#2563EB",
             action: {
               type: "message",
               label: "🌍 多國翻譯",
               text: "設定 多國"
             }
+          },
+          {
+            type: "button",
+            style: "secondary",
+            action: {
+              type: "message",
+              label: "💎 會員方案",
+              text: "會員方案"
+            }
+          }
+        ]
+      },
+      footer: {
+        type: "box",
+        layout: "vertical",
+        contents: [
+          {
+            type: "text",
+            text: "輸入「選單」可再次開啟",
+            size: "xs",
+            color: "#999999",
+            align: "center"
           }
         ]
       }
