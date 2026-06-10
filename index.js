@@ -1,5 +1,6 @@
 const ADMIN_ID = "U99b4b9aca6199942608e0221b4dee60d";
 const vipUsers = {};
+let lastPendingUserId = null;
 const pendingPayments = {};
 const express = require("express");
 const line = require("@line/bot-sdk");
@@ -421,6 +422,13 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 感謝您支持 MO 翻譯 ❤️`);
   return res.status(200).end();
 }
+    if (text.startsWith("開通 ")) {
+  lastPendingUserId = key;
+
+  await replyText(event, "已收到申請，請等待管理員核准。");
+
+  return res.status(200).end();
+    }
     
 
     const mode = userMode[key] || "auto";
