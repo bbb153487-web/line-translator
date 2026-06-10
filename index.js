@@ -1,4 +1,4 @@
-const ADMIN_ID = "";
+const ADMIN_ID = "U99b4b9aca6199942608e0221b4dee60d";
 const vipUsers = {};
 const pendingPayments = {};
 const express = require("express");
