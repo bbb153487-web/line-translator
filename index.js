@@ -388,7 +388,6 @@ if (!vipUsers[key]) {
   return res.status(200).end();
 }
 
-const mode = userMode[key] || "auto";
 const translated = await gptTranslate(text, mode);
     if (text === "我的ID") {
   await replyText(event, "你的ID是：" + key);
