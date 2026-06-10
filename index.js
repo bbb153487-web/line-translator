@@ -425,8 +425,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     if (text === "我的ID" || text === "我的id") {
   await replyText(event, "你的ID是：" + event.source.userId);
   return res.status(200).end();
-    } 
-    if (text === "核准" && event.source.userId === ADMIN_ID) {
+    } if (text.trim() === "核准") {
   if (!lastPendingUserId) {
     await replyText(event, "目前沒有待核准申請。");
     return res.status(200).end();
