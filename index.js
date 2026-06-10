@@ -378,11 +378,6 @@ if (text.startsWith("開通 ")) {
   return res.status(200).end();
 }
 
-if (text === "我的ID") {
-  await replyText(event, "你的ID是：" + key);
-  return res.status(200).end();
-}
-
 if (["選單", "menu", "開始", "?"].includes(text)) {
   await client.replyMessage(event.replyToken, menuFlex());
   return res.status(200).end();
