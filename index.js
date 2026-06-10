@@ -422,6 +422,20 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 感謝您支持 MO 翻譯 ❤️`);
   return res.status(200).end();
 }
+    if (text === "核准" && key === ADMIN_ID) {
+  if (!lastPendingUserId) {
+    await replyText(event, "目前沒有待核准申請。");
+    return res.status(200).end();
+  }
+
+  vipUsers[lastPendingUserId] = true;
+
+  await replyText(event, "已開通會員。");
+
+  lastPendingUserId = null;
+
+  return res.status(200).end();
+    }
     if (text.startsWith("開通 ")) {
   lastPendingUserId = key;
 
