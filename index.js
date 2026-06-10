@@ -96,20 +96,6 @@ function menuFlex() {
     type: "message",
     label: "💎 會員方案",
     text: "會員方案"
-  }
-}
-          {
-  type: "button",
-  style: "secondary",
-  action: {
-    type: "message",
-    label: "💎 會員方案",
-    text: "會員方案"
-  }
-}
-]
-},
-footer: {
 }
         ]
       },
