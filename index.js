@@ -365,23 +365,23 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     const text = event.message.text.trim();
     const key = getUserKey(event);
-    if (text === "vipok") { ... }
-
-if (text.startsWith("開通 ")) { ... }
-
-if (text === "我的ID" || text === "我的id" || text === "我id") {
-  await replyText(event, "你的ID是：" + key);
+    if (text === "vipok") {
+  vipUsers[lastPendingUserId] = true;
+  await replyText(event, "已開通會員。");
+  lastPendingUserId = null;
   return res.status(200).end();
 }
 
-if (text === "會員方案") { ... }
-
-  await replyText(event, "此功能為會員專屬，請輸入「會員方案」查看開通方式。");
-  return res.status(200).end();
-}
+if (text.startsWith("開通 ")) {
+  lastPendingUserId = key;
   await replyText(event, "已收到申請，請等待管理員核准。");
   return res.status(200).end();
-  }
+}
+
+if (text === "會員方案") {
+  await replyText(event, "請選擇會員方案：\n月費 NT$99\n季費 NT$249\n年費 NT$899\n\n付款後請輸入：開通 99 12345");
+  return res.status(200).end();
+}
 
     if (["選單", "menu", "開始", "?"].includes(text)) {
       await client.replyMessage(event.replyToken, menuFlex());
