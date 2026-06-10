@@ -98,7 +98,7 @@ function menuFlex() {
     text: "會員方案"
   }
 }
-{
+          {
   type: "button",
   style: "secondary",
   action: {
@@ -107,6 +107,9 @@ function menuFlex() {
     text: "會員方案"
   }
 }
+]
+},
+footer: {
 }
         ]
       },
