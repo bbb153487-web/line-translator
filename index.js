@@ -387,8 +387,6 @@ if (!vipUsers[key]) {
   await replyText(event, "此功能為會員專屬，請輸入「會員方案」查看開通方式。");
   return res.status(200).end();
 }
-
-const translated = await gptTranslate(text, mode);
     if (text === "我的ID") {
   await replyText(event, "你的ID是：" + key);
   return res.status(200).end();
