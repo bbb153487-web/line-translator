@@ -356,9 +356,9 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     const text = event.message.text.trim();
     const key = getUserKey(event);
     if (text === "我的ID") {
-   await replyText(event, `你的ID是：${key}`);
-   return res.status(200).end();
-  }
+  await replyText(event, "你的ID是：" + key);
+  return res.status(200).end();
+}
 
     if (!text) return res.status(200).end();
 
