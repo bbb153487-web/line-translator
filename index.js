@@ -89,6 +89,7 @@ function menuFlex() {
     text: "我的ID"
   }
 },
+
 {
   type: "button",
   style: "secondary",
@@ -97,6 +98,7 @@ function menuFlex() {
     label: "💎 會員方案",
     text: "會員方案"
   }
+}
 }
         ]
       },
