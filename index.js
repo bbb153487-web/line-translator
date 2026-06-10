@@ -1,3 +1,6 @@
+const ADMIN_ID = "";
+const vipUsers = {};
+const pendingPayments = {};
 const express = require("express");
 const line = require("@line/bot-sdk");
 const OpenAI = require("openai");
@@ -352,6 +355,10 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     const text = event.message.text.trim();
     const key = getUserKey(event);
+    if (text === "我的ID") {
+   await replyText(event, `你的ID是：${key}`);
+   return res.status(200).end();
+  }
 
     if (!text) return res.status(200).end();
 
