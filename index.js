@@ -70,17 +70,17 @@ function menuFlex() {
           { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇻🇳 泰英越", text: "設定 泰英越" } },
           { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇯🇵 泰英日", text: "設定 泰英日" } },
 
-          {，
-            type: "button",
-            style: "primary",
-            color: "#2563EB",
-            action: {
-              type: "message",
-              label: "🌍 多國翻譯",
-              text: "設定 多國"
-            }
-          },
           {
+  type: "button",
+  style: "primary",
+  color: "#2563EB",
+  action: {
+    type: "message",
+    label: "🌍 多國翻譯",
+    text: "設定 多國"
+  }
+},
+{
   type: "button",
   style: "secondary",
   action: {
@@ -89,7 +89,15 @@ function menuFlex() {
     text: "我的ID"
   }
 },
-
+{
+  type: "button",
+  style: "secondary",
+  action: {
+    type: "message",
+    label: "💎 會員方案",
+    text: "會員方案"
+  }
+}
 {
   type: "button",
   style: "secondary",
