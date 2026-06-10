@@ -97,6 +97,7 @@ function menuFlex() {
     label: "💎 會員方案",
     text: "會員方案"
 }
+}
         ]
       },
       footer: {
