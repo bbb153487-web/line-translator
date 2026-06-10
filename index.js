@@ -365,34 +365,23 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     const text = event.message.text.trim();
     const key = getUserKey(event);
-    if (text === "vipok") {
-  vipUsers[lastPendingUserId] = true;
-  await replyText(event, "已開通會員。");
-  lastPendingUserId = null;
-  return res.status(200).end();
-}
+    if (text === "vipok") { ... }
 
-if (text.startsWith("開通 ")) {
-  lastPendingUserId = key;
-  await replyText(event, "已收到申請，請等待管理員核准。");
-  return res.status(200).end();
-}
+if (text.startsWith("開通 ")) { ... }
 
-if (["選單", "menu", "開始", "?"].includes(text)) {
-  await client.replyMessage(event.replyToken, menuFlex());
-  return res.status(200).end();
-}
-
-if (!vipUsers[key]) {
-  await replyText(event, "此功能為會員專屬，請輸入「會員方案」查看開通方式。");
-  return res.status(200).end();
-}
-    if (text === "我的ID") {
+if (text === "我的ID" || text === "我的id" || text === "我id") {
   await replyText(event, "你的ID是：" + key);
   return res.status(200).end();
 }
 
-    if (!text) return res.status(200).end();
+if (text === "會員方案") { ... }
+
+  await replyText(event, "此功能為會員專屬，請輸入「會員方案」查看開通方式。");
+  return res.status(200).end();
+}
+  await replyText(event, "已收到申請，請等待管理員核准。");
+  return res.status(200).end();
+  }
 
     if (["選單", "menu", "開始", "?"].includes(text)) {
       await client.replyMessage(event.replyToken, menuFlex());
