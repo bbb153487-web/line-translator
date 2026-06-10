@@ -365,6 +365,10 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     const text = event.message.text.trim();
     const key = getUserKey(event);
+    if (text.trim() === "核准") {
+  await replyText(event, "核准指令有進來");
+  return res.status(200).end();
+    }
     if (text === "我的ID") {
   await replyText(event, "你的ID是：" + key);
   return res.status(200).end();
