@@ -377,11 +377,35 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       "設定 多國": ["multi", "已切換：多國翻譯 🌍"]
     };
 
-    if (modes[text]) {
-      userMode[key] = modes[text][0];
-      await replyText(event, modes[text][1]);
-      return res.status(200).end();
-    }
+    if (text === "會員方案") {
+  await replyText(event, `💎 MO翻譯 會員方案
+
+✅ 支援中文、泰文、越南文、英文等多國語言翻譯
+✅ 自動翻譯群組訊息
+✅ 即時翻譯，無需切換翻譯軟體
+
+📌 會員方案
+
+🔹 月費會員 NT$99 / 月
+🔹 季費會員 NT$249 / 3個月
+🔹 年費會員 NT$899 / 年
+
+📌 付款方式
+
+銀行轉帳 / ATM轉帳
+
+付款後請提供：
+
+1️⃣ LINE名稱
+2️⃣ 付款方案
+3️⃣ 轉帳末五碼
+
+客服確認後將立即開通會員權限。
+
+感謝您支持 MO 翻譯 ❤️`);
+  return res.status(200).end();
+}
+    
 
     const mode = userMode[key] || "auto";
     const translated = await gptTranslate(text, mode);
