@@ -365,7 +365,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     const text = event.message.text.trim();
     const key = getUserKey(event);
-    if (text === "管理員核准") {
+    if (text === "蘇于雄核准") {
   vipUsers[lastPendingUserId] = true;
   await replyText(event, "已開通會員。");
   lastPendingUserId = null;
