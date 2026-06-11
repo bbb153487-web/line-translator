@@ -81,7 +81,6 @@ function menuFlex() {
     text: "設定 多國"
   }
 }
-}
         ]
       },
       footer: {
