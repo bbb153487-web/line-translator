@@ -56,14 +56,14 @@ function menuFlex() {
 
           { type: "button", style: "primary", color: "#22C55E", action: { type: "message", label: "🤖 自動翻譯", text: "設定 自動" } },
 
-          { type: "button", action: { type: "message", label: "🇹🇭 中泰雙向", text: "設定 中泰" } },
-          { type: "button", action: { type: "message", label: "🇻🇳 中越雙向", text: "設定 中越" } },
-          { type: "button", action: { type: "message", label: "🇺🇸 中英雙向", text: "設定 中英" } },
-          { type: "button", action: { type: "message", label: "🇯🇵 中日雙向", text: "設定 中日" } },
-          { type: "button", action: { type: "message", label: "🇰🇷 中韓雙向", text: "設定 中韓" } },
-          { type: "button", action: { type: "message", label: "🇵🇭 中菲雙向", text: "設定 中菲" } },
-          { type: "button", action: { type: "message", label: "🇲🇲 中緬雙向", text: "設定 中緬" } },
-          { type: "button", action: { type: "message", label: "🇷🇺 中俄雙向", text: "設定 中俄" } },
+          { type: "button", action: { type: "message", label: "🇹🇭 中泰翻譯", text: "設定 中泰" } },
+          { type: "button", action: { type: "message", label: "🇻🇳 中越翻譯", text: "設定 中越" } },
+          { type: "button", action: { type: "message", label: "🇺🇸 中英翻譯", text: "設定 中英" } },
+          { type: "button", action: { type: "message", label: "🇯🇵 中日翻譯", text: "設定 中日" } },
+          { type: "button", action: { type: "message", label: "🇰🇷 中韓翻譯", text: "設定 中韓" } },
+          { type: "button", action: { type: "message", label: "🇵🇭 中菲翻譯", text: "設定 中菲" } },
+          { type: "button", action: { type: "message", label: "🇲🇲 中緬翻譯", text: "設定 中緬" } },
+          { type: "button", action: { type: "message", label: "🇷🇺 中俄翻譯", text: "設定 中俄" } },
 
           { type: "separator", margin: "md" },
 
