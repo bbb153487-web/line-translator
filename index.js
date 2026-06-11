@@ -386,6 +386,11 @@ if (text === "會員方案") {
 
       "設定 多國": ["multi", "已切換：多國翻譯 🌍"]
     };
+    if (modes[text]) {
+  userMode[key] = modes[text][0];
+  await replyText(event, modes[text][1]);
+  return res.status(200).end();
+}
 
     if (text === "會員方案") {
   await replyText(event, `💎 MO翻譯 會員方案
