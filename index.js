@@ -80,23 +80,6 @@ function menuFlex() {
     label: "🌍 多國翻譯",
     text: "設定 多國"
   }
-},
-{
-  type: "button",
-  style: "secondary",
-  action: {
-    type: "message",
-    label: "🆔 查詢我的ID",
-    text: "我的ID"
-  }
-},
-{
-  type: "button",
-  style: "secondary",
-  action: {
-    type: "message",
-    label: "💎 會員方案",
-    text: "會員方案"
 }
 }
         ]
