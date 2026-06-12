@@ -1,7 +1,15 @@
 const ADMIN_ID = "U99b4b9aca6199942608e0221b4dee60d";
+
 const vipUsers = {};
-let lastPendingUserId = null;
 const pendingPayments = {};
+const userUsage = {};
+const userMode = {};
+const userLangs = {};
+
+let lastPendingUserId = null;
+
+const FREE_LIMIT = 5;
+
 const express = require("express");
 const line = require("@line/bot-sdk");
 const OpenAI = require("openai");
@@ -14,14 +22,20 @@ const config = {
 };
 
 const client = new line.Client(config);
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-const userMode = {};
-
 function getUserKey(event) {
   return event.source.groupId || event.source.roomId || event.source.userId;
+}
+
+async function replyText(event, text) {
+  return client.replyMessage(event.replyToken, {
+    type: "text",
+    text
+  });
 }
 
 function menuFlex() {
@@ -49,8 +63,7 @@ function menuFlex() {
             text: "請選擇翻譯模式",
             size: "sm",
             align: "center",
-            color: "#888888",
-            margin: "sm"
+            color: "#888888"
           },
           { type: "separator", margin: "md" },
 
@@ -71,16 +84,9 @@ function menuFlex() {
           { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇻🇳 泰英越", text: "設定 泰英越" } },
           { type: "button", action: { type: "message", label: "🇹🇭🇺🇸🇯🇵 泰英日", text: "設定 泰英日" } },
 
-          {
-  type: "button",
-  style: "primary",
-  color: "#2563EB",
-  action: {
-    type: "message",
-    label: "🌍 多國翻譯",
-    text: "設定 多國"
-  }
-}
+          { type: "button", style: "primary", color: "#2563EB", action: { type: "message", label: "🌍 多國翻譯", text: "設定 多國" } },
+          { type: "button", style: "secondary", action: { type: "message", label: "✅ 複選語言", text: "語言" } },
+          { type: "button", style: "secondary", action: { type: "message", label: "💎 會員方案", text: "會員方案" } }
         ]
       },
       footer: {
@@ -100,207 +106,150 @@ function menuFlex() {
   };
 }
 
-async function replyText(event, text) {
-  return client.replyMessage(event.replyToken, {
-    type: "text",
-    text
-  });
+function languageFlex() {
+  return {
+    type: "flex",
+    altText: "選擇翻譯語言",
+    contents: {
+      type: "bubble",
+      size: "mega",
+      body: {
+        type: "box",
+        layout: "vertical",
+        spacing: "md",
+        contents: [
+          { type: "text", text: "🌐 複選翻譯語言", weight: "bold", size: "xl", align: "center" },
+          { type: "text", text: "可連續選多個語言", size: "sm", align: "center", color: "#888888" },
+          { type: "separator", margin: "md" },
+
+          { type: "button", action: { type: "message", label: "🇹🇼 中文 zh-tw", text: "選語言 zh-tw" } },
+          { type: "button", action: { type: "message", label: "🇹🇭 泰文 th", text: "選語言 th" } },
+          { type: "button", action: { type: "message", label: "🇻🇳 越文 vi", text: "選語言 vi" } },
+          { type: "button", action: { type: "message", label: "🇺🇸 英文 en", text: "選語言 en" } },
+          { type: "button", action: { type: "message", label: "🇯🇵 日文 ja", text: "選語言 ja" } },
+          { type: "button", action: { type: "message", label: "🇰🇷 韓文 ko", text: "選語言 ko" } },
+          { type: "button", action: { type: "message", label: "🇵🇭 菲文 tl", text: "選語言 tl" } },
+          { type: "button", action: { type: "message", label: "🇲🇲 緬文 my", text: "選語言 my" } },
+          { type: "button", action: { type: "message", label: "🇷🇺 俄文 ru", text: "選語言 ru" } },
+
+          { type: "separator", margin: "md" },
+
+          { type: "button", style: "primary", color: "#22C55E", action: { type: "message", label: "✅ 完成選擇", text: "完成語言" } },
+          { type: "button", style: "secondary", action: { type: "message", label: "🔄 重選", text: "重選語言" } }
+        ]
+      }
+    }
+  };
+}
+
+function memberMessage() {
+  return `💎 MO翻譯 會員方案
+
+✅ 支援中文、泰文、越南文、英文等多國語言翻譯
+✅ 支援複選語言
+✅ 即時翻譯，無需切換翻譯軟體
+
+📌 會員方案
+
+🔹 月費會員 NT$99 / 月
+🔹 季費會員 NT$249 / 3個月
+🔹 年費會員 NT$899 / 年
+
+📌 付款方式
+
+銀行轉帳 / ATM轉帳
+
+付款後請輸入：
+開通 99 12345
+
+格式說明：
+開通 金額 轉帳末五碼
+
+客服確認後會立即開通會員權限。`;
+}
+
+function customLangInstruction(mode) {
+  const langMap = {
+    "zh-tw": "🇹🇼 中文",
+    th: "🇹🇭 泰文",
+    vi: "🇻🇳 越文",
+    en: "🇺🇸 英文",
+    ja: "🇯🇵 日文",
+    ko: "🇰🇷 韓文",
+    tl: "🇵🇭 菲律賓文 Tagalog",
+    my: "🇲🇲 緬甸文",
+    ru: "🇷🇺 俄文"
+  };
+
+  const langs = mode.split(",").map(x => x.trim()).filter(Boolean);
+  const list = langs.map(code => langMap[code] || code).join("\n");
+
+  return `
+請把使用者文字翻譯成以下語言：
+
+${list}
+
+格式：
+每個語言一行，前面加國旗與語言名稱。
+
+只輸出翻譯結果，不要解釋。
+`;
 }
 
 async function gptTranslate(text, mode) {
-  const glossary = `
-工作群常用詞庫：
-หมาก = 檳榔
-เคี้ยวหมาก = 嚼檳榔
-กินหมาก = 吃檳榔
-คอมเพลน = 投訴
-โดนคอมเพลน = 被投訴
-ลูกค้า = 客人
-แขก = 客人
-งาน = 工作
-รับงาน = 接工作
-ไม่รับงาน = 不接工作
-ห้อง = 房間
-ย้ายห้อง = 換房
-ขึ้นห้อง = 上房
-ต่อเวลา = 加時
-เพิ่มเวลา = 加時間
-หมดเวลา = 時間到了
-รอ = 等
-รอก่อน = 先等一下
-มารับ = 來接
-ไปรับ = 去接
-ส่ง = 送
-กลับบ้าน = 回家
-ไม่สบาย = 不舒服
-ปวดท้อง = 肚子痛
-ปวดหัว = 頭痛
-เมนส์มา = 月經來
-เหนื่อย = 累
-ง่วง = 想睡
-หิว = 餓
-อิ่มแล้ว = 吃飽了
-เข้าใจแล้ว = 明白了
-ไม่เข้าใจ = 不懂
-ได้ไหม = 可以嗎
-ไม่ได้ = 不可以/不能
-โอเค = 好/OK
-ขอโทษ = 對不起
-ขอบคุณ = 謝謝
-
-特殊術語：
-3P = 三人
-2P = 兩人
-แซนวิช = 夾心
-ช = 男
-ญ = 女
-ช2 = 2男
-ญ2 = 2女
-ไม่จูบปาก = 不親嘴
-จูบปาก = 親嘴
-กอด = 抱
-จับ = 摸
-ห้ามจับ = 不能摸
-ไม่เอา = 不要
-ไม่ทำ = 不做
-กลัว = 怕
-อันตราย = 危險
-
-中文詞庫：
-現在有客人 = ตอนนี้มีลูกค้า
-客人 = ลูกค้า
-熟客 = ลูกค้าประจำ
-老客戶 = ลูกค้าเก่า
-幫我好好服務他 = ช่วยดูแลเขาให้ดีนะ
-`;
-
   const instructions = {
     auto: `
 你是 LINE 群組專用翻譯機。
 
 規則：
-
 1. 自動判斷語言。
 2. 中文翻譯成自然外語。
 3. 泰文、越文、英文、日文、韓文、菲律賓文、緬甸文、俄文翻譯成繁體中文。
 4. 不可輸出原文。
-5. 不可增加標點符號。
+5. 不可增加解釋。
 6. 優先忠實翻譯原文。
 7. 保持原意與語氣。
-8. 不推測情境。
-9. 不補充內容。
-10. 日期與數字保持原格式。
-11. 工作群、娛樂場所常用術語優先採用業界用語。
-12. 只輸出翻譯結果，不解釋。
-13. 代號、房號、日期代碼、編號不要翻譯。
-14. 像 In5/40/2600、K2、B28、A123、LINE ID 等代碼直接保留原文。
-15. 如果內容無法判斷意思，直接回傳原文。
-
-你是一個專業翻譯引擎。
-你是一個專業翻譯引擎。
-
-請逐句翻譯。
-
-保持原意。
-保持語氣。
-不要使用過度口語化表達。
-不要增加額外內容。
-
-只輸出翻譯結果。
-
-範例：
-11 มิถุนายน
-→ 6月11日
-
-5 กรกฎาคม
-→ 7月5日
-
-ตอนนี้มีลูกค้า
-→ 現在有客人
+8. 日期與數字保持原格式。
+9. 代號、房號、日期代碼、編號不要翻譯。
+10. 像 In5/40/2600、K2、B28、A123、LINE ID 等代碼直接保留原文。
+11. 如果內容無法判斷意思，直接回傳原文。
+12. 只輸出翻譯結果。
 `,
 
-
-    "zh-th": `
-你是專業中文泰文雙向翻譯。
-中文必須翻譯成自然泰文。
-泰文必須翻譯成繁體中文。
-中文不可以原文輸出。
-只輸出翻譯結果，不要解釋。
-`,
-
+    "zh-th": "中文翻譯成自然泰文；泰文翻譯成自然繁體中文。只輸出翻譯結果。",
     "zh-vi": "中文翻譯成自然越南文；越南文翻譯成自然繁體中文。只輸出翻譯結果。",
     "zh-en": "中文翻譯成自然英文；英文翻譯成自然繁體中文。只輸出翻譯結果。",
     "zh-ja": "中文翻譯成自然日文；日文翻譯成自然繁體中文。只輸出翻譯結果。",
     "zh-ko": "中文翻譯成自然韓文；韓文翻譯成自然繁體中文。只輸出翻譯結果。",
-    "zh-tl": "中文翻譯成自然菲律賓文 Tagalog；菲律賓文 Tagalog 翻譯成自然繁體中文。只輸出翻譯結果。",
+    "zh-tl": "中文翻譯成自然菲律賓文 Tagalog；菲律賓文翻譯成自然繁體中文。只輸出翻譯結果。",
     "zh-my": "中文翻譯成自然緬甸文；緬甸文翻譯成自然繁體中文。只輸出翻譯結果。",
     "zh-ru": "中文翻譯成自然俄文；俄文翻譯成自然繁體中文。只輸出翻譯結果。",
 
     "zh-th-en": `
-請把使用者文字翻譯成泰文和英文。
-
-格式：
+請把文字翻譯成：
 🇹🇭 泰文：
 🇺🇸 英文：
-
-只輸出翻譯結果，不要解釋。
-
+只輸出翻譯結果。
 `,
 
     "zh-th-en-vi": `
-請把使用者文字翻譯成泰文、英文、越南文。
-
-格式：
+請把文字翻譯成：
 🇹🇭 泰文：
 🇺🇸 英文：
 🇻🇳 越文：
-
-只輸出翻譯結果，不要解釋。
-
+只輸出翻譯結果。
 `,
 
     "zh-th-en-ja": `
-請把使用者文字翻譯成泰文、英文、日文。
-
-格式：
+請把文字翻譯成：
 🇹🇭 泰文：
 🇺🇸 英文：
 🇯🇵 日文：
-
-只輸出翻譯結果，不要解釋。
-
-`,
-"zh-th-en": `
-請把文字翻譯成：
-
-🇹🇭 泰文：
-🇺🇸 英文：
-
 只輸出翻譯結果。
 `,
 
-"zh-th-en-vi": `
-請把文字翻譯成：
-
-🇹🇭 泰文：
-🇺🇸 英文：
-🇻🇳 越文：
-
-只輸出翻譯結果。
-`,
-
-"zh-th-en-ja": `
-請把文字翻譯成：
-
-🇹🇭 泰文：
-🇺🇸 英文：
-🇯🇵 日文：
-
-只輸出翻譯結果。
-`,
     multi: `
 請把使用者文字翻譯成以下語言：
-
 🇹🇭 泰文：
 🇻🇳 越文：
 🇺🇸 英文：
@@ -310,24 +259,29 @@ async function gptTranslate(text, mode) {
 🇲🇲 緬甸文：
 🇷🇺 俄文：
 🇹🇼 中文：
-
 只輸出翻譯結果，不要解釋。
-`,
+`
   };
 
+  let systemPrompt = instructions[mode] || instructions.auto;
+
+  if (mode.includes(",")) {
+    systemPrompt = customLangInstruction(mode);
+  }
+
   const response = await openai.responses.create({
-  model: "gpt-4.1-mini",
-  input: [
-    {
-      role: "system",
-      content: instructions[mode] || instructions.auto
-    },
-    {
-      role: "user",
-      content: text
-    }
-  ]
-});
+    model: "gpt-4.1-mini",
+    input: [
+      {
+        role: "system",
+        content: systemPrompt
+      },
+      {
+        role: "user",
+        content: text
+      }
+    ]
+  });
 
   return response.output_text?.trim() || text;
 }
@@ -347,23 +301,85 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     const text = event.message.text.trim();
     const key = getUserKey(event);
-    if (text.toLowerCase() === "vipok" && event.source.userId === ADMIN_ID) {
-  vipUsers[lastPendingUserId] = true;
-  await replyText(event, "已開通會員。");
-  lastPendingUserId = null;
-  return res.status(200).end();
-}
 
-if (text.startsWith("開通 ")) {
-  lastPendingUserId = key;
-  await replyText(event, "已收到申請，請等待管理員核准。");
-  return res.status(200).end();
-}
+    if (text.toLowerCase() === "vipok") {
+      if (event.source.userId !== ADMIN_ID) {
+        await replyText(event, "此指令限管理員使用。");
+        return res.status(200).end();
+      }
 
-if (text === "會員方案") {
-  await replyText(event, "請選擇會員方案：\n月費 NT$99\n季費 NT$249\n年費 NT$899\n\n付款後請輸入：開通 99 12345");
-  return res.status(200).end();
-}
+      if (!lastPendingUserId) {
+        await replyText(event, "目前沒有待核准申請。");
+        return res.status(200).end();
+      }
+
+      vipUsers[lastPendingUserId] = true;
+      await replyText(event, "已開通會員。");
+      lastPendingUserId = null;
+      return res.status(200).end();
+    }
+
+    if (text.startsWith("開通 ")) {
+      const parts = text.split(/\s+/);
+      const amount = parts[1] || "";
+      const last5 = parts[2] || "";
+
+      lastPendingUserId = key;
+
+      pendingPayments[key] = {
+        amount,
+        last5,
+        time: new Date().toISOString()
+      };
+
+      await replyText(event, "已收到申請，請等待管理員核准。");
+      return res.status(200).end();
+    }
+
+    if (text === "我的ID" || text === "我的id" || text === "我id") {
+      await replyText(event, "你的ID是：" + event.source.userId);
+      return res.status(200).end();
+    }
+
+    if (text === "會員方案") {
+      await replyText(event, memberMessage());
+      return res.status(200).end();
+    }
+
+    if (text === "語言" || text.toLowerCase() === "language") {
+      await client.replyMessage(event.replyToken, languageFlex());
+      return res.status(200).end();
+    }
+
+    if (text.startsWith("選語言 ")) {
+      const lang = text.replace("選語言 ", "").trim();
+
+      if (!userLangs[key]) userLangs[key] = [];
+
+      if (!userLangs[key].includes(lang)) {
+        userLangs[key].push(lang);
+      }
+
+      await replyText(event, "語言(language)： " + userLangs[key].join(","));
+      return res.status(200).end();
+    }
+
+    if (text === "重選語言") {
+      userLangs[key] = [];
+      await client.replyMessage(event.replyToken, languageFlex());
+      return res.status(200).end();
+    }
+
+    if (text === "完成語言") {
+      if (!userLangs[key] || userLangs[key].length === 0) {
+        await replyText(event, "請至少選擇一個語言。");
+        return res.status(200).end();
+      }
+
+      userMode[key] = userLangs[key].join(",");
+      await replyText(event, "已設定語言： " + userLangs[key].join(","));
+      return res.status(200).end();
+    }
 
     if (["選單", "menu", "開始", "?"].includes(text)) {
       await client.replyMessage(event.replyToken, menuFlex());
@@ -383,68 +399,40 @@ if (text === "會員方案") {
       "設定 泰英": ["zh-th-en", "已切換：泰文+英文 🇹🇭🇺🇸"],
       "設定 泰英越": ["zh-th-en-vi", "已切換：泰文+英文+越文 🇹🇭🇺🇸🇻🇳"],
       "設定 泰英日": ["zh-th-en-ja", "已切換：泰文+英文+日文 🇹🇭🇺🇸🇯🇵"],
-
       "設定 多國": ["multi", "已切換：多國翻譯 🌍"]
     };
+
     if (modes[text]) {
-  userMode[key] = modes[text][0];
-  await replyText(event, modes[text][1]);
-  return res.status(200).end();
-}
-
-    if (text === "會員方案") {
-  await replyText(event, `💎 MO翻譯 會員方案
-
-✅ 支援中文、泰文、越南文、英文等多國語言翻譯
-✅ 自動翻譯群組訊息
-✅ 即時翻譯，無需切換翻譯軟體
-
-📌 會員方案
-
-🔹 月費會員 NT$99 / 月
-🔹 季費會員 NT$249 / 3個月
-🔹 年費會員 NT$899 / 年
-
-📌 付款方式
-
-銀行轉帳 / ATM轉帳
-
-付款後請提供：
-
-1️⃣ LINE名稱
-2️⃣ 付款方案
-3️⃣ 轉帳末五碼
-
-客服確認後將立即開通會員權限。
-
-感謝您支持 MO 翻譯 ❤️`);
-  return res.status(200).end();
-}
-    if (text === "我的ID" || text === "我的id") {
-  await replyText(event, "你的ID是：" + event.source.userId);
-  return res.status(200).end();
-    } if (text.trim() === "核准") {
-  if (!lastPendingUserId) {
-    await replyText(event, "目前沒有待核准申請。");
-    return res.status(200).end();
-  }
-
-  vipUsers[lastPendingUserId] = true;
-
-  await replyText(event, "已開通會員。");
-
-  lastPendingUserId = null;
-
-  return res.status(200).end();
+      userMode[key] = modes[text][0];
+      userLangs[key] = [];
+      await replyText(event, modes[text][1]);
+      return res.status(200).end();
     }
-    if (text.startsWith("開通 ")) {
-  lastPendingUserId = key;
 
-  await replyText(event, "已收到申請，請等待管理員核准。");
+    if (!vipUsers[key]) {
+      if (!userUsage[key]) userUsage[key] = 0;
 
-  return res.status(200).end();
+      if (userUsage[key] >= FREE_LIMIT) {
+        await replyText(event, `免費試用次數已用完。
+
+💎 請輸入「會員方案」查看開通方式
+或聯絡客服繳費開通會員。
+
+付款後請輸入：
+開通 99 12345`);
+        return res.status(200).end();
+      }
+
+      userUsage[key]++;
+
+      const freeMode = userMode[key] || "auto";
+      const freeTranslated = await gptTranslate(text, freeMode);
+
+      await replyText(event, `免費試用中：剩餘 ${FREE_LIMIT - userUsage[key]} 次
+
+${freeTranslated}`);
+      return res.status(200).end();
     }
-    
 
     const mode = userMode[key] || "auto";
     const translated = await gptTranslate(text, mode);
