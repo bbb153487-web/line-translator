@@ -391,12 +391,16 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     return res.status(200).end();
   }
 
-  vipUsers[targetUserId] = true;
-  saveVipUsers();
+  vipUsers[targetUserId] = {
+  expireAt: Date.now() + 30 * 24 * 60 * 60 * 1000
+};
 
-  await replyText(event, "已開通會員：" + targetUserId);
-  return res.status(200).end();
-    }
+saveVipUsers();
+
+const expireDate = new Date(vipUsers[targetUserId].expireAt).toLocaleString("zh-TW");
+
+await replyText(event, "已開通會員：\n" + targetUserId + "\n到期時間：\n" + expireDate);
+return res.status(200).end();
 
     if (text === "會員方案") {
       await replyText(event, memberMessage());
