@@ -358,53 +358,54 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       await replyText(event, "你的ID是：" + userId);
       return res.status(200).end();
     }
+
     if (text === "會員到期") {
-  const vip = vipUsers[userId];
+      const vip = vipUsers[userId];
 
-  if (!vip || !vip.expireAt) {
-    await replyText(event, "你目前不是會員");
-    return res.status(200).end();
-  }
+      if (!vip || !vip.expireAt) {
+        await replyText(event, "你目前不是會員");
+        return res.status(200).end();
+      }
 
-  const date = new Date(vip.expireAt);
+      const date = new Date(vip.expireAt);
 
-  await replyText(
-    event,
-    "會員到期時間：\n" + date.toLocaleString("zh-TW")
-  );
-
-  return res.status(200).end();
+      await replyText(event, "會員到期時間：\n" + date.toLocaleString("zh-TW"));
+      return res.status(200).end();
     }
 
     if (text.startsWith("核准") || text.startsWith("核準")) {
-  if (userId !== ADMIN_ID) {
-    await replyText(event, "此指令限管理員使用。");
-    return res.status(200).end();
-  }
+      if (userId !== ADMIN_ID) {
+        await replyText(event, "此指令限管理員使用。");
+        return res.status(200).end();
+      }
 
-  const targetUserId = text
-    .replace("核准", "")
-    .replace("核準", "")
-    .trim();
+      const targetUserId = text
+        .replace("核准", "")
+        .replace("核準", "")
+        .trim();
 
-  if (!targetUserId) {
-    await replyText(event, "請輸入要核准的會員ID");
-    return res.status(200).end();
-  }
+      if (!targetUserId) {
+        await replyText(event, "請輸入要核准的會員ID");
+        return res.status(200).end();
+      }
 
-  vipUsers[targetUserId] = {
-  expireAt: Date.now() + 30 * 24 * 60 * 60 * 1000
-};
+      vipUsers[targetUserId] = {
+        expireAt: Date.now() + 30 * 24 * 60 * 60 * 1000
+      };
 
-saveVipUsers();
+      saveVipUsers();
 
-const expireDate = new Date(vipUsers[targetUserId].expireAt).toLocaleString("zh-TW");
+      const expireDate = new Date(vipUsers[targetUserId].expireAt).toLocaleString("zh-TW");
 
-await replyText(event, "已開通會員：\n" + targetUserId + "\n到期時間：\n" + expireDate);
-return res.status(200).end();
-}
+      await replyText(
+        event,
+        "已開通會員：\n" + targetUserId + "\n到期時間：\n" + expireDate
+      );
 
-if (text === "會員方案") {
+      return res.status(200).end();
+    }
+
+    if (text === "會員方案") {
       await replyText(event, memberMessage());
       return res.status(200).end();
     }
@@ -419,46 +420,59 @@ if (text === "會員方案") {
       return res.status(200).end();
     }
 
-if (!isVip(userId)) {
-  if (!userUsage[key]) userUsage[key] = 0;
+    if (!isVip(userId)) {
+      if (!userUsage[key]) userUsage[key] = 0;
 
-  if (userUsage[key] >= FREE_LIMIT) {
-    await replyText(event, `免費試用次數已用完。
+      if (userUsage[key] >= FREE_LIMIT) {
+        await replyText(
+          event,
+          `免費試用次數已用完。
 
 💎 請輸入「會員方案」查看開通方式
 或聯絡客服繳費開通會員。
 若客服要求，請輸入「我的ID」取得會員ID。
 
 付款後請輸入：
-開通 99 12345`);
+開通 99 12345`
+        );
+        return res.status(200).end();
+      }
+
+      userUsage[key]++;
+
+      const freeMode = userMode[key] || "auto";
+      const freeTranslated = await gptTranslate(text, freeMode);
+
+      await replyText(
+        event,
+        `免費試用中：剩餘 ${FREE_LIMIT - userUsage[key]} 次
+
+${freeTranslated}`
+      );
+
+      return res.status(200).end();
+    }
+
+    const mode = userMode[key] || "auto";
+    const translated = await gptTranslate(text, mode);
+
+    if (!translated) {
+      return res.status(200).end();
+    }
+
+    await replyText(event, translated);
+    return res.status(200).end();
+
+  } catch (err) {
+    console.error(err);
     return res.status(200).end();
   }
+});
 
-  userUsage[key]++;
+app.get("/", (req, res) => {
+  res.send("LINE GPT Translator Bot Running");
+});
 
-  const freeMode = userMode[key] || "auto";
-  const freeTranslated = await gptTranslate(text, freeMode);
-
-if (text === "會員方案") {
-await replyText(event, "已開通會員：\n" + targetUserId + "\n到期時間：\n" + expireDate);
-return res.status(200).end();
-
-}   // ← 這一行一定要加
-
-if (text === "會員方案") {
-
-const mode = userMode[key] || "auto";
-const translated = await gptTranslate(text, mode);
-
-if (!translated) {
-  return res.status(200).end();
-}
-
-await replyText(event, translated);
-return res.status(200).end();
-
-} catch (err) {
-  console.error(err);
-  return res.status(200).end();
-}
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server running");
 });
