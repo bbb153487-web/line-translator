@@ -303,21 +303,21 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     const key = getUserKey(event);
 
     if (text.toLowerCase() === "vipok") {
-      if (event.source.userId !== ADMIN_ID) {
-        await replyText(event, "此指令限管理員使用。");
-        return res.status(200).end();
-      }
+  if (event.source.userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
 
-      if (!lastPendingUserId) {
-        await replyText(event, "目前沒有待核准申請。");
-        return res.status(200).end();
-      }
+  if (!lastPendingUserId) {
+    await replyText(event, "目前沒有待核准申請。");
+    return res.status(200).end();
+  }
 
-      vipUsers[lastPendingUserId] = true;
-      await replyText(event, "已開通會員。");
-      lastPendingUserId = null;
-      return res.status(200).end();
-    }
+  vipUsers[lastPendingUserId] = true;
+  await replyText(event, "已開通會員。");
+  lastPendingUserId = null;
+  return res.status(200).end();
+}
 
     if (text.startsWith("開通 ")) {
       const parts = text.split(/\s+/);
