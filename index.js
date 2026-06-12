@@ -301,6 +301,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     const text = event.message.text.trim();
     const key = getUserKey(event);
+    const userId = event.source.userId;
 
     if (text.toLowerCase() === "vipok") {
   if (event.source.userId !== ADMIN_ID) {
