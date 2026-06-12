@@ -417,6 +417,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
 💎 請輸入「會員方案」查看開通方式
 或聯絡客服繳費開通會員。
+若客服要求，請輸入「我的ID」取得會員ID。
 
 付款後請輸入：
 開通 99 12345`);
