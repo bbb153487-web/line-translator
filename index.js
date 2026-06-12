@@ -2,7 +2,7 @@ const ADMIN_ID = "U99b4b9aca6199942608e0221b4dee60d";
 
 const fs = require("fs");
 
-const VIP_FILE = "./vipUsers.json";
+const VIP_FILE = "/data/vipUsers.json";
 
 function loadVipUsers() {
   try {
