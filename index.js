@@ -413,11 +413,6 @@ ${freeTranslated}`);
   }
 });
 
-    } catch (err) {
-  console.error(err);
-  return res.status(200).end();
-}
-});
 
 app.get("/", (req, res) => {
   res.send("LINE GPT Translator Bot Running");
