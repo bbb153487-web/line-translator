@@ -322,7 +322,6 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     const key = getUserKey(event);
     const userId = event.source.userId;
 
-    if (text.toLowerCase() === "vipok") {
   if (event.source.userId !== ADMIN_ID) {
     await replyText(event, "此指令限管理員使用。");
     return res.status(200).end();
