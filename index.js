@@ -442,8 +442,7 @@ return res.status(200).end();
 
 ${freeTranslated}`);
       return res.status(200).end();
-    }
-
+    
     const mode = userMode[key] || "auto";
     const translated = await gptTranslate(text, mode);
 
