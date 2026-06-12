@@ -342,22 +342,28 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       return res.status(200).end();
     }
 
-    if (text.startsWith("核准 ")) {
-
-  await replyText(event, "進入核准功能");
-
+    if (text.startsWith("核准") || text.startsWith("核準")) {
   if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
     return res.status(200).end();
   }
 
-  const targetUserId = text.replace("核准 ", "").trim();
+  const targetUserId = text
+    .replace("核准", "")
+    .replace("核準", "")
+    .trim();
+
+  if (!targetUserId) {
+    await replyText(event, "請輸入要核准的會員ID");
+    return res.status(200).end();
+  }
 
   vipUsers[targetUserId] = true;
   saveVipUsers();
 
   await replyText(event, "已開通會員：" + targetUserId);
   return res.status(200).end();
-}
+    }
 
     if (text === "會員方案") {
       await replyText(event, memberMessage());
