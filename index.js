@@ -341,6 +341,20 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       await replyText(event, "你的ID是：" + event.source.userId);
       return res.status(200).end();
     }
+    if (text.startsWith("核准 ")) {
+
+  if (event.source.userId !== ADMIN_ID) {
+    return res.status(200).end();
+  }
+
+  const targetUserId = text.replace("核准 ", "").trim();
+
+  vipUsers[targetUserId] = true;
+
+  await replyText(event, "Approved " + targetUserId);
+
+  return res.status(200).end();
+    }
 
     if (text === "會員方案") {
       await replyText(event, memberMessage());
@@ -410,7 +424,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       return res.status(200).end();
     }
 
-    if (!vipUsers[key]) {
+      if (!vipUsers[userId]) {
       if (!userUsage[key]) userUsage[key] = 0;
 
       if (userUsage[key] >= FREE_LIMIT) {
