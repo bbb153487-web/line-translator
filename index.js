@@ -413,69 +413,18 @@ ${freeTranslated}`);
   }
 });
 
-    const modes = {
-      "設定 自動": ["auto", "已切換：自動翻譯 🤖"],
-      "設定 中泰": ["zh-th", "已切換：中泰翻譯 🇹🇼↔️🇹🇭"],
-      "設定 中越": ["zh-vi", "已切換：中越翻譯 🇹🇼↔️🇻🇳"],
-      "設定 中英": ["zh-en", "已切換：中英翻譯 🇹🇼↔️🇺🇸"],
-      "設定 中日": ["zh-ja", "已切換：中日翻譯 🇹🇼↔️🇯🇵"],
-      "設定 中韓": ["zh-ko", "已切換：中韓翻譯 🇹🇼↔️🇰🇷"],
-      "設定 中菲": ["zh-tl", "已切換：中菲翻譯 🇹🇼↔️🇵🇭"],
-      "設定 中緬": ["zh-my", "已切換：中緬翻譯 🇹🇼↔️🇲🇲"],
-      "設定 中俄": ["zh-ru", "已切換：中俄翻譯 🇹🇼↔️🇷🇺"],
-      "設定 泰英": ["zh-th-en", "已切換：泰文+英文 🇹🇭🇺🇸"],
-      "設定 泰英越": ["zh-th-en-vi", "已切換：泰文+英文+越文 🇹🇭🇺🇸🇻🇳"],
-      "設定 泰英日": ["zh-th-en-ja", "已切換：泰文+英文+日文 🇹🇭🇺🇸🇯🇵"],
-      "設定 多國": ["multi", "已切換：多國翻譯 🌍"]
-    };
-
-    if (modes[text]) {
-      userMode[key] = modes[text][0];
-      userLangs[key] = [];
-      await replyText(event, modes[text][1]);
-      return res.status(200).end();
-    }
-
-      if (!vipUsers[userId]) {
-  if (!userUsage[key]) userUsage[key] = 0;
-
-  if (userUsage[key] >= FREE_LIMIT) {
-    await replyText(event, `免費試用次數已用完。
-
-💎 請輸入「會員方案」查看開通方式
-或聯絡客服繳費開通會員。
-若客服要求，請輸入「我的ID」取得會員ID。
-
-付款後請輸入：
-開通 99 12345`);
-    return res.status(200).end();
-  }
-
-  userUsage[key]++;
-
-  const freeMode = userMode[key] || "auto";
-  const freeTranslated = await gptTranslate(text, freeMode);
-
-  await replyText(event, `免費試用中：剩餘 ${FREE_LIMIT - userUsage[key]} 次
-
-${freeTranslated}`);
+    } catch (err) {
+  console.error(err);
   return res.status(200).end();
 }
+});
 
-const mode = userMode[key] || "auto";
-const translated = await gptTranslate(text, mode);
+app.get("/", (req, res) => {
+  res.send("LINE GPT Translator Bot Running");
+});
 
-if (!translated) {
-  return res.status(200).end();
-}
-
-await replyText(event, translated);
-return res.status(200).end();
-    }
-    catch (err) {
-    console.error(err);
-    return res.status(200).end();
-  }
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server running");
 });
 
 app.get("/", (req, res) => {
