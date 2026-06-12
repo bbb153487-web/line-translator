@@ -407,8 +407,7 @@ ${freeTranslated}`);
     await replyText(event, translated);
     return res.status(200).end();
 
-  } 
-  catch (err) {
+} catch (err) {
     console.error(err);
     return res.status(200).end();
   }
