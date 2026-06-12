@@ -418,12 +418,51 @@ return res.status(200).end();
       return res.status(200).end();
     }
 
-    if (!vipUsers[userId]) {
-      if (!userUsage[key]) userUsage[key] = 0;
+if (!isVip(userId)) {
+  if (!userUsage[key]) userUsage[key] = 0;
 
-      if (userUsage[key] >= FREE_LIMIT) {
-        await replyText(event, `免費試用次數已用完。
+  if (userUsage[key] >= FREE_LIMIT) {
+    await replyText(event, `免費試用次數已用完。
 
+💎 請輸入「會員方案」查看開通方式
+或聯絡客服繳費開通會員。
+若客服要求，請輸入「我的ID」取得會員ID。
+
+付款後請輸入：
+開通 99 12345`);
+    return res.status(200).end();
+  }
+
+  userUsage[key]++;
+
+  const freeMode = userMode[key] || "auto";
+  const freeTranslated = await gptTranslate(text, freeMode);
+
+  await replyText(
+    event,
+    `免費試用中：剩餘 ${FREE_LIMIT - userUsage[key]} 次
+
+${freeTranslated}`
+  );
+
+  return res.status(200).end();
+}
+
+const mode = userMode[key] || "auto";
+const translated = await gptTranslate(text, mode);
+
+if (!translated) {
+  return res.status(200).end();
+}
+
+await replyText(event, translated);
+return res.status(200).end();
+
+} catch (err) {
+  console.error(err);
+  return res.status(200).end();
+}
+});
 💎 請輸入「會員方案」查看開通方式
 或聯絡客服繳費開通會員。
 若客服要求，請輸入「我的ID」取得會員ID。
