@@ -402,8 +402,9 @@ const expireDate = new Date(vipUsers[targetUserId].expireAt).toLocaleString("zh-
 
 await replyText(event, "已開通會員：\n" + targetUserId + "\n到期時間：\n" + expireDate);
 return res.status(200).end();
+}
 
-    if (text === "會員方案") {
+if (text === "會員方案") {
       await replyText(event, memberMessage());
       return res.status(200).end();
     }
@@ -438,15 +439,13 @@ if (!isVip(userId)) {
   const freeMode = userMode[key] || "auto";
   const freeTranslated = await gptTranslate(text, freeMode);
 
-  await replyText(
-  event,
-  `免費試用中：剩餘 ${FREE_LIMIT - userUsage[key]} 次
+if (text === "會員方案") {
+await replyText(event, "已開通會員：\n" + targetUserId + "\n到期時間：\n" + expireDate);
+return res.status(200).end();
 
-${freeTranslated}`
-);
+}   // ← 這一行一定要加
 
-  return res.status(200).end();
-}
+if (text === "會員方案") {
 
 const mode = userMode[key] || "auto";
 const translated = await gptTranslate(text, mode);
