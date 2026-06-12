@@ -1,6 +1,25 @@
 const ADMIN_ID = "U99b4b9aca6199942608e0221b4dee60d";
 
-const vipUsers = {};
+const fs = require("fs");
+
+const VIP_FILE = "./vipUsers.json";
+
+function loadVipUsers() {
+  try {
+    if (fs.existsSync(VIP_FILE)) {
+      return JSON.parse(fs.readFileSync(VIP_FILE, "utf8"));
+    }
+  } catch (err) {
+    console.error("讀取 VIP 失敗", err);
+  }
+  return {};
+}
+
+const vipUsers = loadVipUsers();
+
+function saveVipUsers() {
+  fs.writeFileSync(VIP_FILE, JSON.stringify(vipUsers, null, 2));
+}
 const pendingPayments = {};
 const userUsage = {};
 const userMode = {};
