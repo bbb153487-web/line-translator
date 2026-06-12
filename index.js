@@ -9,6 +9,7 @@ function loadVipUsers() {
     if (fs.existsSync(VIP_FILE)) {
       return JSON.parse(fs.readFileSync(VIP_FILE, "utf8"));
     }
+  }
   catch (err) {
     console.error("讀取 VIP 失敗", err);
   }
