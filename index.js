@@ -343,18 +343,21 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     }
 
     if (text.startsWith("核准 ")) {
-      if (userId !== ADMIN_ID) {
-        return res.status(200).end();
-      }
 
-      const targetUserId = text.replace("核准 ", "").trim();
+  await replyText(event, "進入核准功能");
 
-      vipUsers[targetUserId] = true;
-      saveVipUsers();
+  if (userId !== ADMIN_ID) {
+    return res.status(200).end();
+  }
 
-      await replyText(event, "已開通會員：" + targetUserId);
-      return res.status(200).end();
-    }
+  const targetUserId = text.replace("核准 ", "").trim();
+
+  vipUsers[targetUserId] = true;
+  saveVipUsers();
+
+  await replyText(event, "已開通會員：" + targetUserId);
+  return res.status(200).end();
+}
 
     if (text === "會員方案") {
       await replyText(event, memberMessage());
