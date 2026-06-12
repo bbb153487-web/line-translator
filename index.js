@@ -20,6 +20,25 @@ const vipUsers = loadVipUsers();
 function saveVipUsers() {
   fs.writeFileSync(VIP_FILE, JSON.stringify(vipUsers, null, 2));
 }
+function saveVipUsers() {
+  fs.writeFileSync(VIP_FILE, JSON.stringify(vipUsers, null, 2));
+}
+
+function isVip(userId) {
+  const vip = vipUsers[userId];
+
+  if (!vip) return false;
+
+  if (vip.expireAt && Date.now() > vip.expireAt) {
+    delete vipUsers[userId];
+    saveVipUsers();
+    return false;
+  }
+
+  return true;
+}
+
+const pendingPayments = {};
 const pendingPayments = {};
 const userUsage = {};
 const userMode = {};
