@@ -39,7 +39,6 @@ function isVip(userId) {
 }
 
 const pendingPayments = {};
-const pendingPayments = {};
 const userUsage = {};
 const userMode = {};
 const userLangs = {};
