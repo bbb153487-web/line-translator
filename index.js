@@ -357,6 +357,23 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       await replyText(event, "你的ID是：" + userId);
       return res.status(200).end();
     }
+    if (text === "會員到期") {
+  const vip = vipUsers[userId];
+
+  if (!vip || !vip.expireAt) {
+    await replyText(event, "你目前不是會員");
+    return res.status(200).end();
+  }
+
+  const date = new Date(vip.expireAt);
+
+  await replyText(
+    event,
+    "會員到期時間：\n" + date.toLocaleString("zh-TW")
+  );
+
+  return res.status(200).end();
+    }
 
     if (text.startsWith("核准") || text.startsWith("核準")) {
   if (userId !== ADMIN_ID) {
