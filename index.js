@@ -317,11 +317,11 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     if (!event || event.type !== "message" || event.message.type !== "text") {
       return res.status(200).end();
     }
-
+  if (text.toLowerCase() === "vipok") {
     const text = event.message.text.trim();
     const key = getUserKey(event);
     const userId = event.source.userId;
-
+    
   if (event.source.userId !== ADMIN_ID) {
     await replyText(event, "此指令限管理員使用。");
     return res.status(200).end();
