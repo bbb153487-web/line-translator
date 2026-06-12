@@ -362,16 +362,16 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     }
     if (text.startsWith("核准 ")) {
 
-  if (event.source.userId !== ADMIN_ID) {
+  if (userId !== ADMIN_ID) {
     return res.status(200).end();
   }
 
   const targetUserId = text.replace("核准 ", "").trim();
 
   vipUsers[targetUserId] = true;
+  saveVipUsers();
 
-  await replyText(event, "Approved " + targetUserId);
-
+  await replyText(event, "已開通會員：" + targetUserId);
   return res.status(200).end();
     }
 
