@@ -317,20 +317,17 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     if (!event || event.type !== "message" || event.message.type !== "text") {
       return res.status(200).end();
     }
+
     const text = event.message.text.trim();
-    if (text.startsWith("開通 ")) {
-const key = getUserKey(event);
-const userId = event.source.userId;
-  
+    const key = getUserKey(event);
+    const userId = event.source.userId;
 
     if (text.startsWith("開通 ")) {
       const parts = text.split(/\s+/);
       const amount = parts[1] || "";
       const last5 = parts[2] || "";
 
-      lastPendingUserId = key;
-
-      pendingPayments[key] = {
+      pendingPayments[userId] = {
         amount,
         last5,
         time: new Date().toISOString()
@@ -341,22 +338,22 @@ const userId = event.source.userId;
     }
 
     if (text === "我的ID" || text === "我的id" || text === "我id") {
-      await replyText(event, "你的ID是：" + event.source.userId);
+      await replyText(event, "你的ID是：" + userId);
       return res.status(200).end();
     }
+
     if (text.startsWith("核准 ")) {
+      if (userId !== ADMIN_ID) {
+        return res.status(200).end();
+      }
 
-  if (userId !== ADMIN_ID) {
-    return res.status(200).end();
-  }
+      const targetUserId = text.replace("核准 ", "").trim();
 
-  const targetUserId = text.replace("核准 ", "").trim();
+      vipUsers[targetUserId] = true;
+      saveVipUsers();
 
-  vipUsers[targetUserId] = true;
-  saveVipUsers();
-
-  await replyText(event, "已開通會員：" + targetUserId);
-  return res.status(200).end();
+      await replyText(event, "已開通會員：" + targetUserId);
+      return res.status(200).end();
     }
 
     if (text === "會員方案") {
@@ -369,40 +366,52 @@ const userId = event.source.userId;
       return res.status(200).end();
     }
 
-    if (text.startsWith("選語言 ")) {
-      const lang = text.replace("選語言 ", "").trim();
-
-      if (!userLangs[key]) userLangs[key] = [];
-
-      if (!userLangs[key].includes(lang)) {
-        userLangs[key].push(lang);
-      }
-
-      await replyText(event, "語言(language)： " + userLangs[key].join(","));
-      return res.status(200).end();
-    }
-
-    if (text === "重選語言") {
-      userLangs[key] = [];
-      await client.replyMessage(event.replyToken, languageFlex());
-      return res.status(200).end();
-    }
-
-    if (text === "完成語言") {
-      if (!userLangs[key] || userLangs[key].length === 0) {
-        await replyText(event, "請至少選擇一個語言。");
-        return res.status(200).end();
-      }
-
-      userMode[key] = userLangs[key].join(",");
-      await replyText(event, "已設定語言： " + userLangs[key].join(","));
-      return res.status(200).end();
-    }
-
     if (["選單", "menu", "開始", "?"].includes(text)) {
       await client.replyMessage(event.replyToken, menuFlex());
       return res.status(200).end();
     }
+
+    if (!vipUsers[userId]) {
+      if (!userUsage[key]) userUsage[key] = 0;
+
+      if (userUsage[key] >= FREE_LIMIT) {
+        await replyText(event, `免費試用次數已用完。
+
+💎 請輸入「會員方案」查看開通方式
+或聯絡客服繳費開通會員。
+若客服要求，請輸入「我的ID」取得會員ID。
+
+付款後請輸入：
+開通 99 12345`);
+        return res.status(200).end();
+      }
+
+      userUsage[key]++;
+
+      const freeMode = userMode[key] || "auto";
+      const freeTranslated = await gptTranslate(text, freeMode);
+
+      await replyText(event, `免費試用中：剩餘 ${FREE_LIMIT - userUsage[key]} 次
+
+${freeTranslated}`);
+      return res.status(200).end();
+    }
+
+    const mode = userMode[key] || "auto";
+    const translated = await gptTranslate(text, mode);
+
+    if (!translated) {
+      return res.status(200).end();
+    }
+
+    await replyText(event, translated);
+    return res.status(200).end();
+
+  } catch (err) {
+    console.error(err);
+    return res.status(200).end();
+  }
+});
 
     const modes = {
       "設定 自動": ["auto", "已切換：自動翻譯 🤖"],
