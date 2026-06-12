@@ -18,6 +18,21 @@ function loadVipUsers() {
 const vipUsers = loadVipUsers();
 
 function saveVipUsers() {
+  function isVip(userId) {
+  const vip = vipUsers[userId];
+
+  if (!vip) return false;
+
+  if (vip === true) return true; // 舊會員先保留
+
+  if (vip.expireAt && Date.now() > vip.expireAt) {
+    delete vipUsers[userId];
+    saveVipUsers();
+    return false;
+  }
+
+  return true;
+  }
   fs.writeFileSync(VIP_FILE, JSON.stringify(vipUsers, null, 2));
 }
 function saveVipUsers() {
