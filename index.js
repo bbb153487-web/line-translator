@@ -438,9 +438,12 @@ return res.status(200).end();
       const freeMode = userMode[key] || "auto";
       const freeTranslated = await gptTranslate(text, freeMode);
 
-      await replyText(event, `免費試用中：剩餘 ${FREE_LIMIT - userUsage[key]} 次
+      await replyText(
+  event,
+  `免費試用中：剩餘 ${FREE_LIMIT - userUsage[key]} 次
 
-${freeTranslated}`);
+${freeTranslated}`
+);
       return res.status(200).end();
     
     const mode = userMode[key] || "auto";
