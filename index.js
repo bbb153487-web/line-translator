@@ -800,14 +800,9 @@ if (!vip) {
 
   if (userUsage[key] >= FREE_LIMIT) {
 
-    await replyText(
-      event,
-      "免費試用次數已用完..."
-    );
-
-    return res.status(200).end();
-  }
-}
+  await replyText(
+    event,
+    `免費試用次數已用完。
 
 💎 請輸入「會員方案」查看開通方式
 或聯絡客服繳費開通會員。
@@ -815,7 +810,10 @@ if (!vip) {
 
 付款後請輸入：
 開通 99 12345`
-        );
+  );
+
+  return res.status(200).end();
+  }
         return res.status(200).end();
       }
 
