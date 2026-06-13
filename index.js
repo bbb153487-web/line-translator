@@ -57,7 +57,14 @@ function isVipGroup(groupId) {
 }
 
 const pendingPayments = {};
-const userUsage = {};
+
+const USER_USAGE_FILE = "/data/userUsage.json";
+const userUsage = loadJson(USER_USAGE_FILE);
+
+function saveUserUsage() {
+  saveJson(USER_USAGE_FILE, userUsage);
+}
+
 const userMode = {};
 const userLangs = {};
 
@@ -586,9 +593,10 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
         return res.status(200).end();
       }
 
-      userUsage[key]++;
-
-      const freeMode = userMode[key] || "auto";
+      if (!userUsage[key]) {
+  userUsage[key] = 0;
+  saveUserUsage();
+}
       const freeTranslated = await gptTranslate(text, freeMode);
 
       await replyText(
