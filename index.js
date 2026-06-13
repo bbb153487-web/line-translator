@@ -5,6 +5,26 @@ const fs = require("fs");
 const VIP_FILE = "/data/vipUsers.json";
 const VIP_GROUP_FILE = "/data/vipGroups.json";
 
+function loadVipUsers() {
+  try {
+    if (fs.existsSync(VIP_FILE)) {
+      return JSON.parse(fs.readFileSync(VIP_FILE, "utf8"));
+    }
+  } catch (err) {
+    console.error("讀取 VIP 失敗", err);
+  }
+  return {};
+}
+
+const vipUsers = loadVipUsers();
+
+function saveVipUsers() {
+  fs.writeFileSync(
+    VIP_FILE,
+    JSON.stringify(vipUsers, null, 2)
+  );
+}
+
 function loadVipGroups() {
   try {
     if (fs.existsSync(VIP_GROUP_FILE)) {
@@ -24,6 +44,7 @@ function saveVipGroups() {
     JSON.stringify(vipGroups, null, 2)
   );
 }
+
 function isVipGroup(groupId) {
   return vipGroups[groupId] === true;
 }
