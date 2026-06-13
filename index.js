@@ -662,6 +662,59 @@ if (text.startsWith("永久會員 ")) {
       return res.status(200).end();
     }
 
+      if (text === "設定 自動") {
+  userMode[key] = "auto";
+  await replyText(event, "已切換為自動翻譯");
+  return res.status(200).end();
+}
+
+if (text === "設定 中泰") {
+  userMode[key] = "zh-th";
+  await replyText(event, "已切換為中泰翻譯");
+  return res.status(200).end();
+}
+
+if (text === "設定 中越") {
+  userMode[key] = "zh-vi";
+  await replyText(event, "已切換為中越翻譯");
+  return res.status(200).end();
+}
+
+if (text === "設定 中英") {
+  userMode[key] = "zh-en";
+  await replyText(event, "已切換為中英翻譯");
+  return res.status(200).end();
+}
+
+if (text === "設定 中日") {
+  userMode[key] = "zh-ja";
+  await replyText(event, "已切換為中日翻譯");
+  return res.status(200).end();
+}
+
+if (text === "設定 中韓") {
+  userMode[key] = "zh-ko";
+  await replyText(event, "已切換為中韓翻譯");
+  return res.status(200).end();
+}
+
+if (text === "設定 中菲") {
+  userMode[key] = "zh-tl";
+  await replyText(event, "已切換為中菲翻譯");
+  return res.status(200).end();
+}
+
+if (text === "設定 中緬") {
+  userMode[key] = "zh-my";
+  await replyText(event, "已切換為中緬翻譯");
+  return res.status(200).end();
+}
+
+if (text === "設定 中俄") {
+  userMode[key] = "zh-ru";
+  await replyText(event, "已切換為中俄翻譯");
+  return res.status(200).end();
+}
     if (!isVip(userId)) {
       if (!userUsage[key]) userUsage[key] = 0;
 
