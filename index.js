@@ -303,9 +303,11 @@ async function gptTranslate(text, mode) {
 
   let systemPrompt = instructions[mode] || instructions.auto;
 
-  if (mode.includes(",")) {
-    systemPrompt = customLangInstruction(mode);
-  }
+  const customModes = ["zh-tw", "th", "vi", "en", "ja", "ko", "tl", "my", "ru"];
+
+if (customModes.includes(mode) || mode.includes(",")) {
+  systemPrompt = customLangInstruction(mode);
+}
 
   const response = await openai.responses.create({
     model: "gpt-4.1-mini",
