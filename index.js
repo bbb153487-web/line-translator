@@ -715,6 +715,35 @@ if (text === "設定 中俄") {
   await replyText(event, "已切換為中俄翻譯");
   return res.status(200).end();
 }
+    if (text.startsWith("選語言 ")) {
+  const code = text.replace("選語言", "").trim();
+
+  if (!userLangs[key]) userLangs[key] = [];
+
+  if (!userLangs[key].includes(code)) {
+    userLangs[key].push(code);
+  }
+
+  await replyText(event, "已選擇：" + userLangs[key].join(", ") + "\n可繼續選，或輸入「完成語言」");
+  return res.status(200).end();
+}
+
+if (text === "重選語言") {
+  userLangs[key] = [];
+  await replyText(event, "已清空，請重新選擇語言。");
+  return res.status(200).end();
+}
+
+if (text === "完成語言") {
+  if (!userLangs[key] || userLangs[key].length === 0) {
+    await replyText(event, "你還沒有選擇語言。");
+    return res.status(200).end();
+  }
+
+  userMode[key] = userLangs[key].join(",");
+  await replyText(event, "已設定複選語言：\n" + userLangs[key].join(", "));
+  return res.status(200).end();
+}
     if (!isVip(userId)) {
       if (!userUsage[key]) userUsage[key] = 0;
 
