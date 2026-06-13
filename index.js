@@ -19,15 +19,17 @@ function loadVipUsers() {
 const vipUsers = loadVipUsers();
 
 function saveVipUsers() {
+  fs.mkdirSync("/data", { recursive: true });
   fs.writeFileSync(VIP_FILE, JSON.stringify(vipUsers, null, 2));
 }
-
 function isVip(userId) {
   const vip = vipUsers[userId];
 
   if (!vip) return false;
 
   if (vip === true) return true;
+
+  if (vip.permanent) return true;
 
   if (vip.expireAt && Date.now() > vip.expireAt) {
     delete vipUsers[userId];
@@ -372,7 +374,247 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       await replyText(event, "會員到期時間：\n" + date.toLocaleString("zh-TW"));
       return res.status(200).end();
     }
+    if (text === "待審名單") {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
 
+  const list = Object.entries(pendingPayments);
+
+  if (list.length === 0) {
+    await replyText(event, "目前沒有待審會員。");
+    return res.status(200).end();
+  }
+
+  const msg = list.map(([id, p]) =>
+    `ID：${id}\n金額：${p.amount}\n末五碼：${p.last5}\n時間：${p.time}`
+  ).join("\n\n");
+
+  await replyText(event, "待審名單：\n\n" + msg);
+  return res.status(200).end();
+}
+
+if (text === "會員名單") {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const list = Object.entries(vipUsers);
+
+  if (list.length === 0) {
+    await replyText(event, "目前沒有會員。");
+    return res.status(200).end();
+  }
+
+  const msg = list.map(([id, vip]) => {
+    if (vip === true || vip.permanent) {
+      return `ID：${id}\n到期：永久會員`;
+    }
+
+    return `ID：${id}\n到期：${new Date(vip.expireAt).toLocaleString("zh-TW")}`;
+  }).join("\n\n");
+
+  await replyText(event, "會員名單：\n\n" + msg);
+  return res.status(200).end();
+}
+
+if (text.startsWith("續費 ")) {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const parts = text.split(/\s+/);
+  const targetUserId = parts[1];
+  const days = Number(parts[2] || 30);
+
+  if (!targetUserId || !days) {
+    await replyText(event, "格式：續費 會員ID 天數\n例如：續費 Uxxxx 30");
+    return res.status(200).end();
+  }
+
+  const now = Date.now();
+  const oldExpire = vipUsers[targetUserId]?.expireAt || now;
+  const baseTime = oldExpire > now ? oldExpire : now;
+
+  vipUsers[targetUserId] = {
+    expireAt: baseTime + days * 24 * 60 * 60 * 1000
+  };
+
+  saveVipUsers();
+
+  await replyText(
+    event,
+    `已續費會員：\n${targetUserId}\n新增天數：${days}天\n到期時間：\n${new Date(vipUsers[targetUserId].expireAt).toLocaleString("zh-TW")}`
+  );
+
+  return res.status(200).end();
+}
+
+if (text.startsWith("取消會員 ")) {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const targetUserId = text.replace("取消會員", "").trim();
+
+  if (!targetUserId) {
+    await replyText(event, "格式：取消會員 會員ID");
+    return res.status(200).end();
+  }
+  if (text === "待審名單") {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const list = Object.entries(pendingPayments);
+
+  if (list.length === 0) {
+    await replyText(event, "目前沒有待審會員。");
+    return res.status(200).end();
+  }
+
+  const msg = list.map(([id, p]) =>
+    `ID：${id}\n金額：${p.amount}\n末五碼：${p.last5}\n時間：${p.time}`
+  ).join("\n\n");
+
+  await replyText(event, "待審名單：\n\n" + msg);
+  return res.status(200).end();
+}
+
+if (text === "會員名單") {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const list = Object.entries(vipUsers);
+
+  if (list.length === 0) {
+    await replyText(event, "目前沒有會員。");
+    return res.status(200).end();
+  }
+
+  const msg = list.map(([id, vip]) => {
+    if (vip === true || vip.permanent) {
+      return `ID：${id}\n到期：永久會員`;
+    }
+
+    return `ID：${id}\n到期：${new Date(vip.expireAt).toLocaleString("zh-TW")}`;
+  }).join("\n\n");
+
+  await replyText(event, "會員名單：\n\n" + msg);
+  return res.status(200).end();
+}
+
+if (text.startsWith("續費 ")) {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const parts = text.split(/\s+/);
+  const targetUserId = parts[1];
+  const days = Number(parts[2] || 30);
+
+  if (!targetUserId || !days) {
+    await replyText(event, "格式：續費 會員ID 天數\n例如：續費 Uxxxx 30");
+    return res.status(200).end();
+  }
+
+  const now = Date.now();
+  const oldExpire = vipUsers[targetUserId]?.expireAt || now;
+  const baseTime = oldExpire > now ? oldExpire : now;
+
+  vipUsers[targetUserId] = {
+    expireAt: baseTime + days * 24 * 60 * 60 * 1000
+  };
+
+  saveVipUsers();
+
+  await replyText(
+    event,
+    `已續費會員：\n${targetUserId}\n新增天數：${days}天\n到期時間：\n${new Date(vipUsers[targetUserId].expireAt).toLocaleString("zh-TW")}`
+  );
+
+  return res.status(200).end();
+}
+
+if (text.startsWith("取消會員 ")) {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const targetUserId = text.replace("取消會員", "").trim();
+
+  if (!targetUserId) {
+    await replyText(event, "格式：取消會員 會員ID");
+    return res.status(200).end();
+  }
+
+  delete vipUsers[targetUserId];
+  saveVipUsers();
+
+  await replyText(event, "已取消會員：\n" + targetUserId);
+  return res.status(200).end();
+}
+
+if (text.startsWith("永久會員 ")) {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const targetUserId = text.replace("永久會員", "").trim();
+
+  if (!targetUserId) {
+    await replyText(event, "格式：永久會員 會員ID");
+    return res.status(200).end();
+  }
+
+  vipUsers[targetUserId] = {
+    permanent: true
+  };
+
+  saveVipUsers();
+
+  await replyText(event, "已設為永久會員：\n" + targetUserId);
+  return res.status(200).end();
+}
+  delete vipUsers[targetUserId];
+  saveVipUsers();
+
+  await replyText(event, "已取消會員：\n" + targetUserId);
+  return res.status(200).end();
+}
+
+if (text.startsWith("永久會員 ")) {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const targetUserId = text.replace("永久會員", "").trim();
+
+  if (!targetUserId) {
+    await replyText(event, "格式：永久會員 會員ID");
+    return res.status(200).end();
+  }
+
+  vipUsers[targetUserId] = {
+    permanent: true
+  };
+
+  saveVipUsers();
+
+  await replyText(event, "已設為永久會員：\n" + targetUserId);
+  return res.status(200).end();
+}
     if (text.startsWith("核准") || text.startsWith("核準")) {
       if (userId !== ADMIN_ID) {
         await replyText(event, "此指令限管理員使用。");
