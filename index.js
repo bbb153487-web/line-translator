@@ -3,24 +3,29 @@ const ADMIN_ID = "U99b4b9aca6199942608e0221b4dee60d";
 const fs = require("fs");
 
 const VIP_FILE = "/data/vipUsers.json";
+const VIP_GROUP_FILE = "/data/vipGroups.json";
 
-function loadVipUsers() {
+function loadVipGroups() {
   try {
-    if (fs.existsSync(VIP_FILE)) {
-      return JSON.parse(fs.readFileSync(VIP_FILE, "utf8"));
+    if (fs.existsSync(VIP_GROUP_FILE)) {
+      return JSON.parse(fs.readFileSync(VIP_GROUP_FILE, "utf8"));
     }
-  }
-  catch (err) {
-    console.error("讀取 VIP 失敗", err);
+  } catch (e) {
+    console.error(e);
   }
   return {};
 }
 
-const vipUsers = loadVipUsers();
+const vipGroups = loadVipGroups();
 
-function saveVipUsers() {
-  fs.mkdirSync("/data", { recursive: true });
-  fs.writeFileSync(VIP_FILE, JSON.stringify(vipUsers, null, 2));
+function saveVipGroups() {
+  fs.writeFileSync(
+    VIP_GROUP_FILE,
+    JSON.stringify(vipGroups, null, 2)
+  );
+}
+function isVipGroup(groupId) {
+  return vipGroups[groupId] === true;
 }
 function isVip(userId) {
   const vip = vipUsers[userId];
