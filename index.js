@@ -735,7 +735,6 @@ if (text === "設定 中俄") {
 
   return res.status(200).end();
     }
-}
 
 if (text === "重選語言") {
   userLangs[key] = [];
