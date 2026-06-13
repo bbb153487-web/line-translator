@@ -570,11 +570,9 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       saveVipGroups();
     }
 
-    const vip =
-      isVip(userId) ||
-      (event.source.groupId && isVipGroup(event.source.groupId));
+    const vip = true;
 
-    if (!vip) {
+if (!vip) {
       if (!userUsage[key]) userUsage[key] = 0;
 
       if (userUsage[key] >= FREE_LIMIT) {
