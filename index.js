@@ -760,13 +760,33 @@ if (text === "重選語言") {
   return res.status(200).end();
 }
 
-    if (!isVip(userId)) {
-      if (!userUsage[key]) userUsage[key] = 0;
+    if (
+  event.source.groupId &&
+  isVip(userId) &&
+  !isVipGroup(event.source.groupId)
+) {
+  vipGroups[event.source.groupId] = true;
+  saveVipGroups();
+}
 
-      if (userUsage[key] >= FREE_LIMIT) {
-        await replyText(
-          event,
-          `免費試用次數已用完。
+const vip =
+  isVip(userId) ||
+  (event.source.groupId && isVipGroup(event.source.groupId));
+
+if (!vip) {
+
+  if (!userUsage[key]) userUsage[key] = 0;
+
+  if (userUsage[key] >= FREE_LIMIT) {
+
+    await replyText(
+      event,
+      "免費試用次數已用完..."
+    );
+
+    return res.status(200).end();
+  }
+}
 
 💎 請輸入「會員方案」查看開通方式
 或聯絡客服繳費開通會員。
