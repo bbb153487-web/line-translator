@@ -65,8 +65,19 @@ function saveUserUsage() {
   saveJson(USER_USAGE_FILE, userUsage);
 }
 
-const userMode = {};
-const userLangs = {};
+const USER_MODE_FILE = "/data/userMode.json";
+const USER_LANGS_FILE = "/data/userLangs.json";
+
+const userMode = loadJson(USER_MODE_FILE);
+const userLangs = loadJson(USER_LANGS_FILE);
+
+function saveUserMode() {
+  saveJson(USER_MODE_FILE, userMode);
+}
+
+function saveUserLangs() {
+  saveJson(USER_LANGS_FILE, userLangs);
+}
 
 const app = express();
 
@@ -526,6 +537,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
 
     if (modeCommands[text]) {
       userMode[key] = modeCommands[text][0];
+      saveUserMode();
       await replyText(event, modeCommands[text][1]);
       return res.status(200).end();
     }
@@ -540,6 +552,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       }
 
       userMode[key] = userLangs[key].join(",");
+      saveUserMode();
 
       await replyText(event, "已設定語言：\n" + userMode[key]);
       return res.status(200).end();
@@ -552,6 +565,7 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       }
 
       userMode[key] = userLangs[key].join(",");
+      saveUserMode();
       await replyText(event, "已完成語言設定：\n" + userMode[key]);
       return res.status(200).end();
     }
