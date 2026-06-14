@@ -364,6 +364,97 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       await replyText(event, memberMessage());
       return res.status(200).end();
     }
+    if (text === "我的會員" || text === "會員狀態") {
+  const vip = vipUsers[userId];
+
+  if (isVip(userId)) {
+    if (vip === true || vip.permanent) {
+      await replyText(
+        event,
+        `💎 會員狀態：VIP
+
+到期時間：
+永久會員`
+      );
+      return res.status(200).end();
+    }
+
+    const expireDate = new Date(vip.expireAt);
+    const remainDays = Math.ceil((vip.expireAt - Date.now()) / (24 * 60 * 60 * 1000));
+
+    await replyText(
+      event,
+      `💎 會員狀態：VIP
+
+到期時間：
+${expireDate.toLocaleString("zh-TW")}
+
+剩餘天數：
+${remainDays} 天`
+    );
+
+    return res.status(200).end();
+  }
+
+  await replyText(
+    event,
+    `❌ 會員狀態：非會員
+
+請輸入「會員方案」查看開通方式。`
+  );
+
+  return res.status(200).end();
+}
+
+if (text === "我的次數" || text === "剩餘次數") {
+  const used = userUsage[key] || 0;
+  const left = Math.max(FREE_LIMIT - used, 0);
+
+  await replyText(
+    event,
+    `🎁 免費試用次數
+
+已使用：
+${used} 次
+
+剩餘：
+${left} 次`
+  );
+
+  return res.status(200).end();
+}
+
+if (text === "會員統計") {
+  if (userId !== ADMIN_ID) {
+    await replyText(event, "此指令限管理員使用。");
+    return res.status(200).end();
+  }
+
+  const users = Object.values(vipUsers);
+  const totalVip = users.length;
+  const permanentVip = users.filter(v => v === true || v.permanent).length;
+  const normalVip = totalVip - permanentVip;
+  const groupVip = Object.keys(vipGroups).length;
+
+  await replyText(
+    event,
+    `📊 會員統計
+
+總會員數：
+${totalVip}
+
+一般會員：
+${normalVip}
+
+永久會員：
+${permanentVip}
+
+VIP群組：
+${groupVip}`
+  );
+
+  return res.status(200).end();
+}
 
     if (text === "會員到期") {
       const vip = vipUsers[userId];
