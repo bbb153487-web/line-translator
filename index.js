@@ -200,6 +200,7 @@ function memberMessage() {
 🔹 季費會員 NT$249 / 3個月
 🔹 年費會員 NT$899 / 年
 
+https://p.ecpay.com.tw/F43B892
 付款後請輸入：
 開通 99 12345
 
