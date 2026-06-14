@@ -222,32 +222,35 @@ https://line.me/ti/p/26E88hQ84C
 
 function customLangInstruction(mode) {
   const langMap = {
-    "zh-tw": "🇹🇼 中文",
-    th: "🇹🇭 泰文",
-    vi: "🇻🇳 越文",
-    en: "🇺🇸 英文",
-    ja: "🇯🇵 日文",
-    ko: "🇰🇷 韓文",
-    tl: "🇵🇭 菲律賓文 Tagalog",
-    my: "🇲🇲 緬甸文",
-    ru: "🇷🇺 俄文"
+    "zh-tw": "繁體中文",
+    th: "泰文",
+    vi: "越南文",
+    en: "英文",
+    ja: "日文",
+    ko: "韓文",
+    tl: "菲律賓文 Tagalog",
+    my: "緬甸文",
+    ru: "俄文"
   };
 
   const langs = mode.split(",").map(x => x.trim()).filter(Boolean);
-  const list = langs.map(code => langMap[code] || code).join("\n");
+  const list = langs.map(code => langMap[code] || code).join("、");
 
   return `
-請把使用者文字翻譯成以下語言：
+你是 LINE 群組雙向翻譯機。
 
-${list}
-
-格式：
-每個語言一行，前面加國旗與語言名稱。
+目標語言：${list}
 
 規則：
-1. 只輸出翻譯結果，不要解釋。
-2. 優先逐句直譯，不得意譯。
-3. 不得改變人稱、稱謂、日期、時間、數字、金額。
+1. 如果使用者輸入繁體中文或簡體中文，請翻譯成目標語言。
+2. 如果使用者輸入目標語言，請翻譯成繁體中文。
+3. 不要顯示國旗。
+4. 不要顯示「泰文、中文、英文」等語言名稱。
+5. 只輸出翻譯結果。
+6. 不要解釋。
+7. 不可輸出原文，除非完全無法判斷意思。
+8. 優先逐句直譯，不得意譯。
+9. 不得改變人稱、稱謂、日期、時間、數字、金額。
 `;
 }
 
