@@ -201,6 +201,8 @@ function memberMessage() {
 🔹 年費會員 NT$899 / 年
 
 https://p.ecpay.com.tw/F43B892
+📞 客服 LINE
+https://line.me/ti/p/Jvdamdv5jW
 付款後請輸入：
 開通 99 12345
 
