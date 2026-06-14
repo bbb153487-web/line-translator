@@ -202,7 +202,7 @@ function memberMessage() {
 
 https://p.ecpay.com.tw/F43B892
 📞 客服 LINE
-https://line.me/ti/p/xj-1NIm6VQ
+https://line.me/ti/p/26E88hQ84C
 付款後請輸入：
 開通 99 12345
 
